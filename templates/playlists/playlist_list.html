@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Featured & Public Playlists — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 1240px; margin: 0 auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+      <h1 style="font-size: 1.8rem; font-weight: 800;">Featured & Curated Playlists</h1>
+      <p style="color: var(--text-muted); font-size: 0.92rem;">Explore curated playlists by editors, tastemakers, and community creators.</p>
+    </div>
+
+    {% if user.is_authenticated %}
+    <div style="display: flex; gap: 12px;">
+      <a href="{% url 'playlists:user_playlists' %}" class="btn btn-secondary">My Playlists</a>
+      <a href="{% url 'playlists:create' %}" class="btn btn-primary">+ Create Playlist</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="media-grid">
+    {% for pl in playlists %}
+    <div class="music-card" onclick="window.location.href='{% url 'playlists:detail' pl.slug %}'">
+      <img src="{{ pl.cover_art_url }}" class="music-card-cover" alt="{{ pl.title }}">
+      <div class="music-card-title">{{ pl.title }}</div>
+      <div class="music-card-artist">By {{ pl.owner.username }}</div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.75rem; color: var(--text-dim);">
+        <span>{{ pl.playlist_tracks.count }} tracks</span>
+        <span>👥 {{ pl.follower_count }} saves</span>
+      </div>
+    </div>
+    {% empty %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: var(--text-dim);">
+      📝 No public playlists yet. Be the first to create one!
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

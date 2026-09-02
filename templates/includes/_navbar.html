@@ -8,9 +8,9 @@
     {% if user.is_authenticated %}
       <a href="{% url 'notifications:list' %}" style="position: relative; color: var(--text-muted); text-decoration: none; font-size: 1.2rem;">
         🔔
-        {% if UNREAD_NOTIFICATIONS_COUNT > 0 %}
+        {% if unread_notifications_count > 0 or UNREAD_NOTIFICATIONS_COUNT > 0 %}
         <span style="position: absolute; top: -6px; right: -6px; background: var(--accent-pink); color: white; border-radius: 50%; font-size: 0.65rem; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-          {{ UNREAD_NOTIFICATIONS_COUNT }}
+          {{ unread_notifications_count|default:UNREAD_NOTIFICATIONS_COUNT }}
         </span>
         {% endif %}
       </a>

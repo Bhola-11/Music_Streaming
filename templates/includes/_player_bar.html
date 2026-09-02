@@ -1,36 +1,77 @@
-<!-- Persistent Audio Player Container -->
-<div id="musicverse-player-bar" class="player-bar">
-  <div class="player-track-info">
-    <img id="player-track-cover" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=120&auto=format&fit=crop&q=80" alt="Track Cover" class="player-cover-art">
-    <div class="player-track-meta">
-      <h4 id="player-track-title">Select a Track to Play</h4>
-      <p id="player-track-artist">MusicVerse Stream</p>
+<!-- Persistent Glassmorphic Audio Player Bar & Real-time Web Audio Visualizer -->
+<div id="musicverse-player-bar" class="player-bar-container" style="display: none;">
+  <!-- Left: Currently Playing Metadata -->
+  <div style="display: flex; align-items: center; gap: 14px; width: 25%; min-width: 200px;">
+    <img id="player-cover" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100" alt="Cover" style="width: 52px; height: 52px; border-radius: var(--border-radius-sm); object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">
+    <div style="overflow: hidden; max-width: 170px;">
+      <div id="player-title" style="font-weight: 700; font-size: 0.92rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">No track playing</div>
+      <div id="player-artist" style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">MusicVerse</div>
     </div>
-    <button id="player-btn-like" class="player-ctrl-btn" title="Save to Favorites" style="margin-left: 8px;">🤍</button>
+    <button id="player-like-btn" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--text-dim); transition: transform 0.2s ease;" title="Save to Liked Songs">🤍</button>
   </div>
 
-  <div class="player-controls-center">
-    <div class="player-buttons">
-      <button id="player-btn-shuffle" class="player-ctrl-btn" title="Shuffle">🔀</button>
-      <button id="player-btn-prev" class="player-ctrl-btn" title="Previous Track">⏮</button>
-      <button id="player-btn-play" class="play-btn-master" title="Play/Pause">▶</button>
-      <button id="player-btn-next" class="player-ctrl-btn" title="Next Track">⏭</button>
-      <button id="player-btn-repeat" class="player-ctrl-btn" title="Repeat">🔁</button>
+  <!-- Center: Controls, Scrubber & Real-time Synced Lyric ticker -->
+  <div style="flex: 1; max-width: 600px; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+    <!-- Transport Controls -->
+    <div style="display: flex; align-items: center; gap: 18px;">
+      <button id="player-shuffle-btn" class="player-ctrl-btn" title="Shuffle">🔀</button>
+      <button id="player-prev-btn" class="player-ctrl-btn" title="Previous">⏮</button>
+      <button id="player-play-btn" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; color: #fff; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 16px rgba(0, 195, 255, 0.4); transition: transform 0.15s ease;" title="Play / Pause">▶</button>
+      <button id="player-next-btn" class="player-ctrl-btn" title="Next">⏭</button>
+      <button id="player-repeat-btn" class="player-ctrl-btn" title="Repeat Off">🔁</button>
     </div>
 
-    <div class="player-progress-bar-container">
-      <span id="player-current-time" class="time-stamp">0:00</span>
-      <input type="range" id="player-seek-slider" class="seek-bar" min="0" max="100" value="0">
-      <span id="player-total-time" class="time-stamp">0:00</span>
+    <!-- Progress Scrubber -->
+    <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
+      <span id="player-current-time" style="font-size: 0.72rem; color: var(--text-dim); width: 32px; text-align: right;">0:00</span>
+      <div id="player-progress" style="flex: 1; height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; cursor: pointer; position: relative; overflow: hidden;">
+        <div id="player-progress-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple)); border-radius: 3px;"></div>
+      </div>
+      <span id="player-duration-time" style="font-size: 0.72rem; color: var(--text-dim); width: 32px;">0:00</span>
     </div>
+
+    <!-- Live Synced Lyrics preview ticker -->
+    <div id="player-synced-lyric-bar" style="font-size: 0.78rem; color: var(--accent-cyan); height: 14px; opacity: 0; transition: opacity 0.3s ease; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 450px;"></div>
   </div>
 
-  <div class="player-options-right">
-    <button id="player-btn-visualizer-toggle" class="player-ctrl-btn" title="3D Visualizer Mode">🌌</button>
-    <button id="player-btn-queue" class="player-ctrl-btn" title="Playing Queue">📑</button>
-    <div style="display: flex; align-items: center; gap: 8px; width: 120px;">
-      <span style="font-size: 0.9rem; color: var(--text-dim);">🔊</span>
-      <input type="range" id="player-volume-slider" class="seek-bar" min="0" max="100" value="85">
-    </div>
+  <!-- Right: Frequency Visualizer & Volume -->
+  <div style="display: flex; align-items: center; justify-content: flex-end; gap: 14px; width: 25%; min-width: 200px;">
+    <!-- Mini Canvas Audio Visualizer -->
+    <canvas id="player-visualizer-canvas" width="80" height="24" style="border-radius: 3px; opacity: 0.85;"></canvas>
+
+    <!-- Volume -->
+    <span id="player-volume-icon" style="font-size: 0.9rem; color: var(--text-muted);">🔊</span>
+    <input type="range" id="player-volume" min="0" max="100" value="80" style="width: 80px; accent-color: var(--accent-cyan); height: 4px; cursor: pointer;">
   </div>
 </div>
+
+<style>
+.player-bar-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: rgba(10, 11, 16, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-glass);
+  padding: 0 28px;
+  z-index: 1000;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+}
+.player-ctrl-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.player-ctrl-btn:hover {
+  color: var(--text-main);
+  transform: scale(1.1);
+}
+</style>

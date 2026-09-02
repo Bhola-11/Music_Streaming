@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications Inbox — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 860px; margin: 0 auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+      <h1 style="font-size: 1.8rem; font-weight: 800;">Notifications</h1>
+      <p style="color: var(--text-muted); font-size: 0.92rem;">Activity updates, artist releases, playlist collabs, and security alerts.</p>
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+      <a href="{% url 'notifications:preferences' %}" class="btn btn-secondary btn-sm">⚙️ Preferences</a>
+      <form method="POST" action="{% url 'notifications:api_mark_all_read' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary btn-sm">Mark All as Read</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="glass-panel">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      {% for notif in notifications %}
+      <div class="notification-card {% if not notif.is_read %}unread{% endif %}" style="padding: 16px; background: {% if not notif.is_read %}rgba(0, 195, 255, 0.06){% else %}rgba(255,255,255,0.02){% endif %}; border: 1px solid {% if not notif.is_read %}rgba(0, 195, 255, 0.25){% else %}var(--border-glass){% endif %}; border-radius: var(--border-radius-sm); display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; gap: 14px; align-items: center;">
+          <span style="font-size: 1.5rem;">
+            {% if notif.notification_type == 'new_release' %}🎵
+            {% elif notif.notification_type == 'playlist_add' %}📝
+            {% elif notif.notification_type == 'new_follower' %}👥
+            {% elif notif.notification_type == 'royalty_payout' %}💰
+            {% elif notif.notification_type == 'security_alert' %}🚨
+            {% else %}🔔{% endif %}
+          </span>
+          <div>
+            <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">{{ notif.title }}</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">{{ notif.message }}</div>
+            <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px;">{{ notif.created_at|timesince }} ago</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+          {% if notif.action_url %}
+          <a href="{{ notif.action_url }}" class="btn btn-secondary btn-sm" onclick="markRead('{{ notif.id }}')">View →</a>
+          {% endif %}
+          {% if not notif.is_read %}
+          <button class="btn btn-secondary btn-sm" onclick="markRead('{{ notif.id }}', this)" title="Mark as read">✓</button>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div style="text-align: center; padding: 50px; color: var(--text-dim);">
+        <div style="font-size: 3rem; margin-bottom: 12px;">🔔</div>
+        <p style="font-size: 1rem;">You are all caught up! No notifications.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+function markRead(notifId, btn) {
+  fetch(`/notifications/api/read/${notifId}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)[1],
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success && btn) {
+      btn.closest('.notification-card').style.background = 'rgba(255,255,255,0.02)';
+      btn.remove();
+    }
+  });
+}
+</script>
+{% endblock %}

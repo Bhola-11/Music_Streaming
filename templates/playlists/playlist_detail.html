@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ playlist.title }} — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto;">
+  <!-- Playlist Header Banner -->
+  <div class="glass-panel" style="display: flex; gap: 32px; align-items: flex-end; margin-bottom: 32px; padding: 32px;">
+    <img src="{{ playlist.cover_art_url }}" alt="{{ playlist.title }}" style="width: 230px; height: 230px; border-radius: var(--border-radius-md); object-fit: cover; box-shadow: var(--shadow-card);">
+
+    <div style="flex: 1;">
+      <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+        <span class="badge badge-verified">{{ playlist.get_privacy_display }}</span>
+        {% if playlist.is_collaborative %}
+        <span class="badge badge-premium">Collaborative</span>
+        {% endif %}
+      </div>
+
+      <h1 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 6px;">{{ playlist.title }}</h1>
+      {% if playlist.description %}
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 12px; line-height: 1.5;">{{ playlist.description }}</p>
+      {% endif %}
+
+      <div style="display: flex; gap: 18px; font-size: 0.88rem; color: var(--text-dim); margin-bottom: 24px;">
+        <span>Created by <strong>{{ playlist.owner.username }}</strong></span>
+        <span>🎵 {{ tracks|length }} tracks</span>
+        <span>⏱ {{ playlist.formatted_total_duration }}</span>
+        <span>👥 {{ playlist.follower_count }} saves</span>
+      </div>
+
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        {% if tracks %}
+        <button class="btn btn-primary" onclick="playAllPlaylist()">
+          ▶ Play All
+        </button>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+          {% if not is_owner %}
+          <form method="POST" action="{% url 'playlists:toggle_follow' playlist.slug %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn {% if is_following %}btn-primary{% else %}btn-secondary{% endif %}">
+              {% if is_following %}Saved in Library ✓{% else %}Save Playlist{% endif %}
+            </button>
+          </form>
+          {% endif %}
+
+          {% if is_owner %}
+          <a href="{% url 'playlists:edit' playlist.slug %}" class="btn btn-secondary">✏️ Edit Details</a>
+          <a href="{% url 'playlists:delete' playlist.slug %}" class="btn btn-secondary" style="color: #ff4757;">🗑️ Delete</a>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Collaborators Ribbon (if collaborative) -->
+  {% if playlist.is_collaborative or is_owner %}
+  <div class="glass-panel" style="margin-bottom: 24px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-weight: 700; font-size: 0.92rem; color: var(--text-muted);">COLLABORATORS:</span>
+      <div style="display: flex; gap: 8px;">
+        <span class="badge badge-lossless">{{ playlist.owner.username }} (Owner)</span>
+        {% for c in collaborators %}
+        <span class="badge badge-verified">{{ c.user.username }} ({{ c.get_role_display }})</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if is_owner %}
+    <form method="POST" action="{% url 'playlists:manage_collaborators' playlist.slug %}" style="display: flex; gap: 8px; align-items: center;">
+      {% csrf_token %}
+      {{ collab_form.username_or_email }}
+      {{ collab_form.role }}
+      <button type="submit" class="btn btn-primary btn-sm">+ Invite</button>
+    </form>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Sequenced Tracklist with Drag-and-Drop Order Support -->
+  <div class="glass-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+      <h3 style="font-size: 1.2rem; font-weight: 700;">Tracklist</h3>
+      {% if can_edit and tracks %}
+      <span style="font-size: 0.8rem; color: var(--accent-cyan);">💡 Drag items or use remove buttons to curate.</span>
+      {% endif %}
+    </div>
+
+    <div id="playlist-tracklist-container" style="display: flex; flex-direction: column; gap: 8px;">
+      {% for item in tracks %}
+      <div class="playlist-track-row" data-song-id="{{ item.song.id }}" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); transition: background 0.2s ease;">
+        <div style="display: flex; align-items: center; gap: 16px; flex: 1;">
+          <span style="font-weight: 700; color: var(--text-dim); width: 20px; text-align: center;">{{ item.position }}</span>
+          <img src="{{ item.song.cover_art_url }}" style="width: 42px; height: 42px; border-radius: 4px; object-fit: cover;">
+          <div>
+            <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">{{ item.song.title }}</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">
+              {{ item.song.artist.name }} • Added by {{ item.added_by.username|default:"Owner" }}
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 18px;">
+          <span style="font-size: 0.85rem; color: var(--text-dim);">{{ item.song.formatted_duration }}</span>
+          <button class="btn btn-secondary btn-sm" onclick="playSong('{{ item.song.id }}', '{{ item.song.title|escapejs }}', '{{ item.song.artist.name|escapejs }}', '{{ item.song.cover_art_url|escapejs }}', '{% url 'music:stream' item.song.id %}')">
+            ▶
+          </button>
+          {% if can_edit %}
+          <button class="btn btn-secondary btn-sm" style="color: #ff4757; padding: 4px 8px;" onclick="removeTrack('{{ playlist.id }}', '{{ item.song.id }}')" title="Remove track">
+            ✕
+          </button>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div style="text-align: center; padding: 48px; color: var(--text-dim);">
+        <p style="font-size: 0.95rem;">This playlist is empty. Explore tracks to add songs!</p>
+        <a href="{% url 'music:song_list' %}" class="btn btn-secondary btn-sm" style="margin-top: 12px;">Browse Audio Catalog</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+function playAllPlaylist() {
+  const tracks = [
+    {% for item in tracks %}
+    {
+      id: "{{ item.song.id }}",
+      title: "{{ item.song.title|escapejs }}",
+      artist: "{{ item.song.artist.name|escapejs }}",
+      cover_art: "{{ item.song.cover_art_url|escapejs }}",
+      stream_url: "{% url 'music:stream' item.song.id %}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+  if (tracks.length > 0 && window.musicPlayer) {
+    window.musicPlayer.queue = tracks;
+    window.musicPlayer.currentIndex = 0;
+    window.musicPlayer.play(tracks[0]);
+  }
+}
+
+function removeTrack(playlistId, songId) {
+  if (!confirm("Remove this song from the playlist?")) return;
+  fetch(`/playlists/${playlistId}/remove-track/${songId}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)[1],
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      window.location.reload();
+    } else {
+      alert(data.error || "Failed to remove track.");
+    }
+  });
+}
+</script>
+{% endblock %}

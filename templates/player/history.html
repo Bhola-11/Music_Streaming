@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Listening History & Streams — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+      <h1 style="font-size: 1.8rem; font-weight: 800;">Listening History</h1>
+      <p style="color: var(--text-muted); font-size: 0.92rem;">Audit log of all tracks you've streamed across your connected devices.</p>
+    </div>
+  </div>
+
+  <div class="glass-panel">
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      {% for item in history %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); transition: background 0.2s ease;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <img src="{{ item.song.cover_art_url }}" style="width: 44px; height: 44px; border-radius: 4px; object-fit: cover;">
+          <div>
+            <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">{{ item.song.title }}</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">{{ item.song.artist.name }}</div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 20px;">
+          <span style="font-size: 0.8rem; color: var(--text-dim);">
+            {% if item.was_skipped %}<span style="color: #ff6b6b;">Skipped</span>{% else %}<span style="color: var(--accent-green);">{{ item.completion_percentage|floatformat:0 }}% completed</span>{% endif %}
+          </span>
+          <span style="font-size: 0.82rem; color: var(--text-dim);">{{ item.played_at|timesince }} ago</span>
+          <button class="btn btn-secondary btn-sm" onclick="playSong('{{ item.song.id }}', '{{ item.song.title|escapejs }}', '{{ item.song.artist.name|escapejs }}', '{{ item.song.cover_art_url|escapejs }}', '{% url 'music:stream' item.song.id %}')">
+            ▶
+          </button>
+        </div>
+      </div>
+      {% empty %}
+      <div style="text-align: center; padding: 50px; color: var(--text-dim);">
+        <p style="font-size: 1rem;">No playback history recorded yet.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

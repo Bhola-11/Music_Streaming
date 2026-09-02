@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Notification Preferences — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 720px; margin: 0 auto;">
+  <div class="glass-panel">
+    <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h2 style="font-size: 1.5rem; font-weight: 800;">Notification Preferences</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Choose which activities and alerts trigger in-app notifications.</p>
+      </div>
+      <a href="{% url 'notifications:list' %}" class="btn btn-secondary btn-sm">← Inbox</a>
+    </div>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <label style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); cursor: pointer;">
+          <div>
+            <div style="font-weight: 600; font-size: 0.95rem;">New Music Releases</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Notify when followed artists publish new albums or songs</div>
+          </div>
+          {{ form.notify_new_releases }}
+        </label>
+
+        <label style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); cursor: pointer;">
+          <div>
+            <div style="font-weight: 600; font-size: 0.95rem;">Playlist Collaborations</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Notify when collaborators add tracks or invite you to a playlist</div>
+          </div>
+          {{ form.notify_playlist_collaborations }}
+        </label>
+
+        <label style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); cursor: pointer;">
+          <div>
+            <div style="font-weight: 600; font-size: 0.95rem;">Social Followers</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Notify when someone follows your user profile or playlist</div>
+          </div>
+          {{ form.notify_social_followers }}
+        </label>
+
+        <label style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); cursor: pointer;">
+          <div>
+            <div style="font-weight: 600; font-size: 0.95rem;">Royalty Earnings (Artists)</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Monthly payout and royalty calculation summaries</div>
+          </div>
+          {{ form.notify_royalty_earnings }}
+        </label>
+
+        <label style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); cursor: pointer;">
+          <div>
+            <div style="font-weight: 600; font-size: 0.95rem;">Security & Account Alerts</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Critical notifications regarding 2FA, password changes, and new logins</div>
+          </div>
+          {{ form.notify_security_events }}
+        </label>
+      </div>
+
+      <div style="display: flex; gap: 16px; margin-top: 28px;">
+        <button type="submit" class="btn btn-primary" style="padding: 12px 32px;">Save Preferences</button>
+        <a href="{% url 'notifications:list' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
