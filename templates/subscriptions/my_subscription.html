@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}My Subscription — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+  <div class="glass-panel">
+    <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h2 style="font-size: 1.6rem; font-weight: 800;">Subscription & Billing</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Manage your active tier, renewal date, and audio quality access.</p>
+      </div>
+      <a href="{% url 'subscriptions:plans' %}" class="btn btn-secondary btn-sm">Browse All Plans</a>
+    </div>
+
+    {% if subscription and subscription.is_valid %}
+    <div style="padding: 24px; background: rgba(0, 195, 255, 0.05); border: 1px solid rgba(0, 195, 255, 0.2); border-radius: var(--border-radius-md); margin-bottom: 28px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <h3 style="font-size: 1.5rem; font-weight: 800;">{{ subscription.tier.name }}</h3>
+          <span class="badge badge-verified">{{ subscription.get_status_display }}</span>
+        </div>
+        <span style="font-size: 1.4rem; font-weight: 800; color: var(--accent-cyan);">${{ subscription.tier.price_monthly_usd }}/mo</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 0.9rem; color: var(--text-muted);">
+        <div>📅 Billing Cycle: <strong>{{ subscription.get_billing_cycle_display }}</strong></div>
+        <div>⏱ Renews On: <strong>{{ subscription.current_period_end|date:"F j, Y" }}</strong></div>
+        <div>🎧 1411 kbps Lossless: <strong>{% if subscription.tier.allows_lossless %}Enabled ✓{% else %}Standard 320kbps{% endif %}</strong></div>
+        <div>📱 Device Limit: <strong>{{ subscription.tier.max_devices }} Active Devices</strong></div>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <a href="{% url 'subscriptions:plans' %}" class="btn btn-primary">Change Subscription Plan</a>
+      
+      {% if not subscription.cancel_at_period_end %}
+      <form method="POST" action="{% url 'subscriptions:cancel' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-secondary" style="color: #ff4757;" onclick="return confirm('Cancel renewal at period end?')">Cancel Subscription</button>
+      </form>
+      {% else %}
+      <span style="color: var(--text-dim); font-size: 0.85rem;">Cancellation scheduled for {{ subscription.current_period_end|date:"M j, Y" }}.</span>
+      {% endif %}
+    </div>
+
+    {% else %}
+    <div style="text-align: center; padding: 40px;">
+      <div style="font-size: 3rem; margin-bottom: 12px;">🎵</div>
+      <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Free Listener Account</h3>
+      <p style="color: var(--text-muted); margin-bottom: 24px;">Upgrade to Hi-Fi Pro to unlock studio master lossless streaming and offline downloads.</p>
+      <a href="{% url 'subscriptions:plans' %}" class="btn btn-primary" style="padding: 12px 32px;">Explore Hi-Fi Pro Plans</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

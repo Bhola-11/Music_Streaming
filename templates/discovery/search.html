@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results for "{{ query }}" — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+  <div style="margin-bottom: 28px;">
+    <h1 style="font-size: 1.8rem; font-weight: 800;">
+      {% if query %}Search Results for <span style="color: var(--accent-cyan);">"{{ query }}"</span>{% else %}Universal Search{% endif %}
+    </h1>
+    {% if query %}
+    <p style="color: var(--text-muted); font-size: 0.92rem;">Found {{ total_hits }} matches across songs, artists, albums, and playlists.</p>
+    {% endif %}
+  </div>
+
+  {% if not query %}
+  <div class="glass-panel" style="text-align: center; padding: 60px;">
+    <div style="font-size: 3.5rem; margin-bottom: 16px;">🔍</div>
+    <h2 style="font-size: 1.4rem; margin-bottom: 8px;">Explore the Entire Catalog</h2>
+    <p style="color: var(--text-muted); max-width: 400px; margin: 0 auto;">Type any track title, artist name, album, or playlist in the top search bar.</p>
+  </div>
+  {% else %}
+
+    <!-- Songs Results -->
+    {% if songs %}
+    <div style="margin-bottom: 36px;">
+      <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px;">🎵 Songs</h3>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        {% for song in songs %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); transition: background 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <img src="{{ song.cover_art_url }}" style="width: 44px; height: 44px; border-radius: 4px; object-fit: cover;">
+            <div>
+              <a href="{% url 'music:song_detail' song.id %}" style="font-weight: 600; font-size: 0.95rem; color: var(--text-main); text-decoration: none;">{{ song.title }}</a>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">{{ song.artist.name }} • {{ song.genre.name|default:"Track" }}</div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <span style="font-size: 0.85rem; color: var(--text-dim);">{{ song.formatted_duration }}</span>
+            <button class="btn btn-secondary btn-sm" onclick="playSong('{{ song.id }}', '{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', '{{ song.cover_art_url|escapejs }}', '{% url 'music:stream' song.id %}')">
+              ▶
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Artists Results -->
+    {% if artists %}
+    <div style="margin-bottom: 36px;">
+      <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px;">🎤 Artists</h3>
+      <div class="media-grid">
+        {% for artist in artists %}
+        <div class="music-card" style="text-align: center;" onclick="window.location.href='{% url 'artists:detail' artist.slug %}'">
+          <img src="{{ artist.avatar_display }}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 0 auto 10px auto; display: block;">
+          <div class="music-card-title">{{ artist.name }}</div>
+          <div class="music-card-artist">{{ artist.monthly_listeners }} listeners</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Albums Results -->
+    {% if albums %}
+    <div style="margin-bottom: 36px;">
+      <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px;">💿 Albums</h3>
+      <div class="media-grid">
+        {% for album in albums %}
+        <div class="music-card" onclick="window.location.href='{% url 'albums:detail' album.slug %}'">
+          <img src="{{ album.cover_art_url }}" class="music-card-cover">
+          <div class="music-card-title">{{ album.title }}</div>
+          <div class="music-card-artist">{{ album.artist.name }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Playlists Results -->
+    {% if playlists %}
+    <div>
+      <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px;">📑 Playlists</h3>
+      <div class="media-grid">
+        {% for pl in playlists %}
+        <div class="music-card" onclick="window.location.href='{% url 'playlists:detail' pl.slug %}'">
+          <img src="{{ pl.cover_art_url }}" class="music-card-cover">
+          <div class="music-card-title">{{ pl.title }}</div>
+          <div class="music-card-artist">By {{ pl.owner.username }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if total_hits == 0 %}
+    <div class="glass-panel" style="text-align: center; padding: 60px; color: var(--text-dim);">
+      <p style="font-size: 1.05rem;">No results found for "{{ query }}". Try searching for a different keyword or artist.</p>
+    </div>
+    {% endif %}
+
+  {% endif %}
+</div>
+{% endblock %}

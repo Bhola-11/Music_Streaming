@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Made For You — Algorithmic Discoveries{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+  <div style="margin-bottom: 28px;">
+    <h1 style="font-size: 1.8rem; font-weight: 800;">✨ Made For You</h1>
+    <p style="color: var(--text-muted); font-size: 0.92rem;">Personalized Daily Mixes and algorithmic recommendations tuned to your acoustic taste.</p>
+  </div>
+
+  <!-- Daily Mixes Carousel / Grid -->
+  <div style="margin-bottom: 40px;">
+    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px;">Your Daily Mixes</h3>
+    <div class="media-grid">
+      {% for mix in daily_mixes %}
+      <div class="music-card" onclick="window.location.href='{% url 'recommendations:daily_mix' mix.id %}'">
+        <div style="height: 180px; background: linear-gradient(135deg, rgba(0, 195, 255, 0.2), rgba(157, 78, 221, 0.4)); border-radius: var(--border-radius-sm); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 12px; border: 1px solid var(--border-glass);">
+          ⚡ {{ mix.mix_number }}
+        </div>
+        <div class="music-card-title">{{ mix.title }}</div>
+        <div class="music-card-artist">{{ mix.description|truncatewords:6 }}</div>
+      </div>
+      {% empty %}
+      <div class="glass-panel" style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-dim);">
+        Start listening to tracks to generate your first personalized Daily Mixes!
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Recommended Tracks -->
+  <div>
+    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px;">Recommended Frequencies</h3>
+    <div class="media-grid">
+      {% for song in recommended_tracks %}
+      <div class="music-card" onclick="playSong('{{ song.id }}', '{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', '{{ song.cover_art_url|escapejs }}', '{% url 'music:stream' song.id %}')">
+        <img src="{{ song.cover_art_url }}" class="music-card-cover" alt="{{ song.title }}">
+        <div class="music-card-title">{{ song.title }}</div>
+        <div class="music-card-artist">{{ song.artist.name }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Membership Tiers & Hi-Fi Pro Streaming — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 1180px; margin: 0 auto; text-align: center;">
+  <div style="margin-bottom: 40px;">
+    <span class="badge badge-lossless" style="font-size: 0.8rem; margin-bottom: 12px; display: inline-block;">STUDIO QUALITY AUDIO</span>
+    <h1 style="font-size: 2.6rem; font-weight: 800; margin-bottom: 12px;">Unleash Pure 1411 kbps Lossless Sound</h1>
+    <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 600px; margin: 0 auto;">
+      Experience music in studio master resolution with 3D Spatial Audio, unlimited offline downloads, and zero interruptions.
+    </p>
+  </div>
+
+  <!-- Pricing Cards Grid -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 48px; text-align: left;">
+    {% for tier in tiers %}
+    <div class="glass-panel" style="padding: 32px; display: flex; flex-direction: column; justify-content: space-between; position: relative; {% if tier.is_popular %}border-color: var(--accent-cyan); box-shadow: 0 0 30px rgba(0, 195, 255, 0.2);{% endif %}">
+      {% if tier.is_popular %}
+      <span class="badge badge-verified" style="position: absolute; top: -12px; right: 24px; padding: 4px 12px; font-weight: 700;">MOST POPULAR</span>
+      {% endif %}
+
+      <div>
+        <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 6px;">{{ tier.name }}</h3>
+        <p style="color: var(--text-muted); font-size: 0.88rem; min-height: 40px; margin-bottom: 20px;">{{ tier.description }}</p>
+
+        <div style="margin-bottom: 24px;">
+          <span style="font-size: 2.5rem; font-weight: 800; color: var(--text-main);">${{ tier.price_monthly_usd }}</span>
+          <span style="color: var(--text-dim); font-size: 0.9rem;">/ month</span>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-glass); padding-top: 20px; margin-bottom: 28px;">
+          <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">WHAT'S INCLUDED:</div>
+          <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; color: var(--text-muted);">
+            {% for b in tier.benefits.all %}
+            <li style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: var(--accent-cyan);">✓</span> {{ b.benefit_text }}
+            </li>
+            {% empty %}
+            <li style="display: flex; align-items: center; gap: 8px;"><span style="color: var(--accent-cyan);">✓</span> 320 kbps High Quality Audio</li>
+            <li style="display: flex; align-items: center; gap: 8px;"><span style="color: var(--accent-cyan);">✓</span> Unlimited Web & Mobile Playback</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <div>
+        {% if user.is_authenticated and current_subscription and current_subscription.tier == tier %}
+        <button class="btn btn-secondary" style="width: 100%; cursor: default;" disabled>Current Plan ✓</button>
+        {% else %}
+        <form method="POST" action="{% url 'subscriptions:subscribe' tier.slug %}">
+          {% csrf_token %}
+          <input type="hidden" name="billing_cycle" value="monthly">
+          <button type="submit" class="btn {% if tier.is_popular %}btn-primary{% else %}btn-secondary{% endif %}" style="width: 100%;">
+            {% if tier.price_monthly_usd == 0 %}Get Started Free{% else %}Upgrade to {{ tier.name }}{% endif %}
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

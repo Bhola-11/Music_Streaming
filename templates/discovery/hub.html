@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Discovery Hub & Global Charts — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 1240px; margin: 0 auto;">
+  <!-- Hero Featured Banner Showcase -->
+  {% if hero_banners %}
+  <div class="glass-panel" style="padding: 0; overflow: hidden; margin-bottom: 36px;">
+    {% with banner=hero_banners.0 %}
+    <div style="height: 340px; background: linear-gradient(90deg, rgba(10,11,16,0.95) 0%, rgba(10,11,16,0.4) 60%, rgba(10,11,16,0.85) 100%), url('{{ banner.banner_image.url }}') center/cover; display: flex; align-items: center; padding: 48px;">
+      <div style="max-width: 550px;">
+        <span class="badge badge-lossless" style="font-size: 0.75rem; margin-bottom: 12px; display: inline-block;">{{ banner.badge_text }}</span>
+        <h1 style="font-size: 2.6rem; font-weight: 800; line-height: 1.15; margin-bottom: 12px;">{{ banner.title }}</h1>
+        <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 24px;">{{ banner.subtitle }}</p>
+        <a href="{{ banner.action_url }}" class="btn btn-primary" style="padding: 12px 32px; font-size: 1rem;">{{ banner.action_button_text }}</a>
+      </div>
+    </div>
+    {% endwith %}
+  </div>
+  {% endif %}
+
+  <!-- Trending Top 10 Master Tracks -->
+  <div style="margin-bottom: 40px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+      <div>
+        <h2 style="font-size: 1.5rem; font-weight: 800;">🔥 Trending Masters</h2>
+        <p style="color: var(--text-muted); font-size: 0.88rem;">Most streamed tracks across MusicVerse this week.</p>
+      </div>
+      <a href="{% url 'discovery:charts' %}" class="btn btn-secondary btn-sm">Explore Charts →</a>
+    </div>
+
+    <div class="media-grid">
+      {% for song in trending_songs %}
+      <div class="music-card" onclick="playSong('{{ song.id }}', '{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', '{{ song.cover_art_url|escapejs }}', '{% url 'music:stream' song.id %}')">
+        <div style="position: relative;">
+          <img src="{{ song.cover_art_url }}" class="music-card-cover" alt="{{ song.title }}">
+          <span style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: var(--accent-cyan); font-weight: 800; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px;">#{{ forloop.counter }}</span>
+        </div>
+        <div class="music-card-title">{{ song.title }}</div>
+        <div class="music-card-artist">{{ song.artist.name }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- MusicVerse Official Charts -->
+  <div style="margin-bottom: 40px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+      <div>
+        <h2 style="font-size: 1.5rem; font-weight: 800;">📊 Official Streaming Charts</h2>
+        <p style="color: var(--text-muted); font-size: 0.88rem;">Global top 50, viral hits, and genre leaders.</p>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
+      {% for chart in charts %}
+      <a href="{% url 'discovery:chart_detail' chart.slug %}" class="glass-panel" style="text-decoration: none; padding: 20px; transition: transform 0.2s ease, border-color 0.2s ease;" onmouseover="this.style.transform='translateY(-4px)'; this.style.borderColor='var(--accent-cyan)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border-glass)'">
+        <img src="{{ chart.cover_art_url }}" style="width: 100%; height: 160px; object-fit: cover; border-radius: var(--border-radius-sm); margin-bottom: 14px;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">{{ chart.title }}</h3>
+        <p style="color: var(--text-muted); font-size: 0.8rem;">{{ chart.get_chart_type_display }}</p>
+      </a>
+      {% empty %}
+      <div class="glass-panel" style="grid-column: 1 / -1; text-align: center; padding: 30px; color: var(--text-dim);">
+        Official charts calculated automatically.
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- New Releases -->
+  <div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+      <div>
+        <h2 style="font-size: 1.5rem; font-weight: 800;">⚡ Fresh Releases</h2>
+        <p style="color: var(--text-muted); font-size: 0.88rem;">Brand new tracks just added to the catalog.</p>
+      </div>
+      <a href="{% url 'music:song_list' %}" class="btn btn-secondary btn-sm">View All Songs →</a>
+    </div>
+
+    <div class="media-grid">
+      {% for song in new_releases %}
+      <div class="music-card" onclick="playSong('{{ song.id }}', '{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', '{{ song.cover_art_url|escapejs }}', '{% url 'music:stream' song.id %}')">
+        <img src="{{ song.cover_art_url }}" class="music-card-cover" alt="{{ song.title }}">
+        <div class="music-card-title">{{ song.title }}</div>
+        <div class="music-card-artist">{{ song.artist.name }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

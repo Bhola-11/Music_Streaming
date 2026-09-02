@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Successful — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 620px; margin: 40px auto; text-align: center;">
+  <div class="glass-panel" style="padding: 48px;">
+    <div style="font-size: 4rem; margin-bottom: 16px;">🎉</div>
+    <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 8px;">Payment Successful!</h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px;">
+      Your payment of <strong>${{ transaction.amount_usd }}</strong> was confirmed.
+    </p>
+
+    <div style="padding: 16px; background: rgba(0, 195, 255, 0.05); border-radius: var(--border-radius-sm); border: 1px solid rgba(0, 195, 255, 0.2); margin-bottom: 28px; text-align: left; font-size: 0.88rem; color: var(--text-muted);">
+      <div>Transaction ID: <strong>{{ transaction.transaction_id }}</strong></div>
+      <div>Payment Provider: <strong>{{ transaction.get_provider_display }}</strong></div>
+      <div>Date: <strong>{{ transaction.created_at|date:"F j, Y, P" }}</strong></div>
+    </div>
+
+    <div style="display: flex; gap: 14px; justify-content: center;">
+      <a href="{% url 'music:song_list' %}" class="btn btn-primary">Start Streaming Hi-Fi Masters</a>
+      {% if invoice %}
+      <a href="{% url 'payments:invoice_detail' invoice.invoice_number %}" class="btn btn-secondary">View Invoice</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

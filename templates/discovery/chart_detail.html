@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ chart.title }} — MusicVerse Official Chart{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto;">
+  <div class="glass-panel" style="display: flex; gap: 32px; align-items: flex-end; margin-bottom: 32px; padding: 32px;">
+    <img src="{{ chart.cover_art_url }}" alt="{{ chart.title }}" style="width: 200px; height: 200px; border-radius: var(--border-radius-md); object-fit: cover; box-shadow: var(--shadow-card);">
+
+    <div style="flex: 1;">
+      <span class="badge badge-lossless" style="margin-bottom: 8px;">OFFICIAL CHART</span>
+      <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 6px;">{{ chart.title }}</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 16px;">{{ chart.description|default:"Ranked by global streams." }}</p>
+
+      <div style="display: flex; gap: 18px; font-size: 0.85rem; color: var(--text-dim);">
+        <span>🎵 {{ entries|length }} ranked tracks</span>
+        <span>⏱ Updated {{ chart.updated_at|timesince }} ago</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-panel">
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      {% for entry in entries %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); transition: background 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span style="font-weight: 800; font-size: 1.1rem; color: {% if entry.rank <= 3 %}var(--accent-cyan){% else %}var(--text-dim){% endif %}; width: 28px; text-align: center;">{{ entry.rank }}</span>
+          <span style="font-size: 0.72rem; width: 34px; text-align: center; color: {% if '+' in entry.rank_change %}var(--accent-green){% elif '-' in entry.rank_change %}#ff4757{% else %}var(--text-dim){% endif %};">
+            {{ entry.rank_change }}
+          </span>
+          <img src="{{ entry.song.cover_art_url }}" style="width: 44px; height: 44px; border-radius: 4px; object-fit: cover;">
+          <div>
+            <a href="{% url 'music:song_detail' entry.song.id %}" style="font-weight: 600; font-size: 0.95rem; color: var(--text-main); text-decoration: none;">{{ entry.song.title }}</a>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">{{ entry.song.artist.name }}</div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 18px;">
+          <span style="font-size: 0.85rem; color: var(--text-dim);">{{ entry.song.formatted_duration }}</span>
+          <button class="btn btn-secondary btn-sm" onclick="playSong('{{ entry.song.id }}', '{{ entry.song.title|escapejs }}', '{{ entry.song.artist.name|escapejs }}', '{{ entry.song.cover_art_url|escapejs }}', '{% url 'music:stream' entry.song.id %}')">
+            ▶
+          </button>
+        </div>
+      </div>
+      {% empty %}
+      <div style="text-align: center; padding: 40px; color: var(--text-dim);">
+        No songs ranked on this chart yet.
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

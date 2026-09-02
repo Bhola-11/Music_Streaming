@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+  <div class="glass-panel" style="padding: 40px;">
+    <!-- Invoice Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; border-bottom: 1px solid var(--border-glass); padding-bottom: 24px;">
+      <div>
+        <h1 style="font-size: 1.8rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 4px;">MusicVerse LLC</h1>
+        <p style="color: var(--text-dim); font-size: 0.85rem;">Digital Audio Streaming & Artist Platform</p>
+      </div>
+      <div style="text-align: right;">
+        <h2 style="font-size: 1.2rem; font-weight: 700;">INVOICE</h2>
+        <div style="color: var(--text-muted); font-size: 0.9rem;">#{{ invoice.invoice_number }}</div>
+        <div style="color: var(--text-dim); font-size: 0.8rem; margin-top: 4px;">Date: {{ invoice.issued_at|date:"F j, Y" }}</div>
+      </div>
+    </div>
+
+    <!-- Billed To -->
+    <div style="margin-bottom: 32px;">
+      <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">BILLED TO:</div>
+      <div style="font-size: 1rem; font-weight: 600;">{{ invoice.billing_name }}</div>
+      <div style="color: var(--text-muted); font-size: 0.9rem;">{{ invoice.billing_email }}</div>
+    </div>
+
+    <!-- Line Item -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 32px; font-size: 0.92rem;">
+      <thead>
+        <tr style="border-bottom: 1px solid var(--border-glass); color: var(--text-dim); text-align: left;">
+          <th style="padding: 12px 0;">Description</th>
+          <th style="padding: 12px 0; text-align: right;">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 16px 0;">{{ invoice.transaction.description }}</td>
+          <td style="padding: 16px 0; text-align: right; font-weight: 700;">${{ invoice.subtotal_usd }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Totals -->
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 32px;">
+      <div style="width: 250px; display: flex; flex-direction: column; gap: 8px; font-size: 0.95rem;">
+        <div style="display: flex; justify-content: space-between; color: var(--text-muted);">
+          <span>Subtotal:</span>
+          <span>${{ invoice.subtotal_usd }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; color: var(--text-muted);">
+          <span>Tax (0%):</span>
+          <span>$0.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 1.2rem; color: var(--accent-cyan); border-top: 1px solid var(--border-glass); padding-top: 8px;">
+          <span>Total:</span>
+          <span>${{ invoice.total_usd }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 14px;">
+      <button onclick="window.print()" class="btn btn-primary btn-sm">🖨️ Print / Save PDF</button>
+      <a href="{% url 'subscriptions:my_subscription' %}" class="btn btn-secondary btn-sm">← Back to Subscriptions</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

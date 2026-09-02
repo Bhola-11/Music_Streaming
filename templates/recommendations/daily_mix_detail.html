@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ mix.title }} — Made For You{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto;">
+  <div class="glass-panel" style="display: flex; gap: 32px; align-items: flex-end; margin-bottom: 32px; padding: 32px; background: linear-gradient(135deg, rgba(0, 195, 255, 0.15), rgba(157, 78, 221, 0.25));">
+    <div style="width: 200px; height: 200px; border-radius: var(--border-radius-md); background: linear-gradient(135deg, #00C3FF, #9D4EDD); display: flex; align-items: center; justify-content: center; font-size: 4rem; box-shadow: var(--shadow-card);">
+      ⚡
+    </div>
+
+    <div style="flex: 1;">
+      <span class="badge badge-lossless" style="margin-bottom: 8px;">ALGORITHMIC MIX</span>
+      <h1 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 6px;">{{ mix.title }}</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 18px;">{{ mix.description }}</p>
+
+      <div style="display: flex; gap: 14px;">
+        {% if tracks %}
+        <button class="btn btn-primary" onclick="playAllMix()">
+          ▶ Play Daily Mix
+        </button>
+        {% endif %}
+        <a href="{% url 'recommendations:feed' %}" class="btn btn-secondary">← Back to Feed</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-panel">
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      {% for item in tracks %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); transition: background 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span style="font-weight: 700; color: var(--text-dim); width: 24px;">{{ item.position }}</span>
+          <img src="{{ item.song.cover_art_url }}" style="width: 44px; height: 44px; border-radius: 4px; object-fit: cover;">
+          <div>
+            <a href="{% url 'music:song_detail' item.song.id %}" style="font-weight: 600; font-size: 0.95rem; color: var(--text-main); text-decoration: none;">{{ item.song.title }}</a>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">{{ item.song.artist.name }} • {{ item.song.genre.name|default:"Electronic" }}</div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 18px;">
+          <span style="font-size: 0.85rem; color: var(--text-dim);">{{ item.song.formatted_duration }}</span>
+          <button class="btn btn-secondary btn-sm" onclick="playSong('{{ item.song.id }}', '{{ item.song.title|escapejs }}', '{{ item.song.artist.name|escapejs }}', '{{ item.song.cover_art_url|escapejs }}', '{% url 'music:stream' item.song.id %}')">
+            ▶
+          </button>
+        </div>
+      </div>
+      {% empty %}
+      <div style="text-align: center; padding: 40px; color: var(--text-dim);">
+        Mix is regenerating.
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+function playAllMix() {
+  const tracks = [
+    {% for item in tracks %}
+    {
+      id: "{{ item.song.id }}",
+      title: "{{ item.song.title|escapejs }}",
+      artist: "{{ item.song.artist.name|escapejs }}",
+      cover_art: "{{ item.song.cover_art_url|escapejs }}",
+      stream_url: "{% url 'music:stream' item.song.id %}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+  if (tracks.length > 0 && window.musicPlayer) {
+    window.musicPlayer.queue = tracks;
+    window.musicPlayer.currentIndex = 0;
+    window.musicPlayer.play(tracks[0]);
+  }
+}
+</script>
+{% endblock %}

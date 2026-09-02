@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Official Charts & Rankings — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+  <div style="margin-bottom: 28px;">
+    <h1 style="font-size: 1.8rem; font-weight: 800;">Official Streaming Charts</h1>
+    <p style="color: var(--text-muted); font-size: 0.92rem;">Updated in real time based on verified global listener streams.</p>
+  </div>
+
+  <div class="media-grid">
+    {% for chart in charts %}
+    <div class="music-card" onclick="window.location.href='{% url 'discovery:chart_detail' chart.slug %}'">
+      <img src="{{ chart.cover_art_url }}" class="music-card-cover" alt="{{ chart.title }}">
+      <div class="music-card-title">{{ chart.title }}</div>
+      <div class="music-card-artist">{{ chart.get_chart_type_display }}</div>
+    </div>
+    {% empty %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: var(--text-dim);">
+      📊 Charts calculating daily streams.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
