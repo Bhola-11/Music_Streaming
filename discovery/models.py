@@ -22,7 +22,7 @@ class FeaturedBanner(models.Model):
     title = models.CharField(max_length=150)
     subtitle = models.CharField(max_length=250, blank=True)
     badge_text = models.CharField(max_length=50, default='FEATURED RELEASE')
-    banner_image = models.ImageField(upload_to='banners/%Y/%m/')
+    banner_image = models.ImageField(upload_to='banners/%Y/%m/', blank=True, null=True)
     action_url = models.CharField(max_length=255)
     action_button_text = models.CharField(max_length=50, default='Listen Now')
     is_active = models.BooleanField(default=True, db_index=True)
@@ -34,6 +34,12 @@ class FeaturedBanner(models.Model):
 
     def __str__(self):
         return f"Banner: {self.title}"
+
+    @property
+    def banner_image_url(self):
+        if self.banner_image and hasattr(self.banner_image, 'url'):
+            return self.banner_image.url
+        return 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&auto=format&fit=crop&q=80'
 
 
 class MusicChart(models.Model):

@@ -8,7 +8,7 @@
   {% if hero_banners %}
   <div class="glass-panel" style="padding: 0; overflow: hidden; margin-bottom: 36px;">
     {% with banner=hero_banners.0 %}
-    <div style="height: 340px; background: linear-gradient(90deg, rgba(10,11,16,0.95) 0%, rgba(10,11,16,0.4) 60%, rgba(10,11,16,0.85) 100%), url('{{ banner.banner_image.url }}') center/cover; display: flex; align-items: center; padding: 48px;">
+    <div style="height: 340px; background: linear-gradient(90deg, rgba(10,11,16,0.95) 0%, rgba(10,11,16,0.4) 60%, rgba(10,11,16,0.85) 100%), url('{{ banner.banner_image_url }}') center/cover; display: flex; align-items: center; padding: 48px;">
       <div style="max-width: 550px;">
         <span class="badge badge-lossless" style="font-size: 0.75rem; margin-bottom: 12px; display: inline-block;">{{ banner.badge_text }}</span>
         <h1 style="font-size: 2.6rem; font-weight: 800; line-height: 1.15; margin-bottom: 12px;">{{ banner.title }}</h1>
