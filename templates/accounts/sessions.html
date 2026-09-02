@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Sessions & Devices — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 860px; margin: 0 auto;">
+  <div class="glass-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass);">
+      <div>
+        <h2 style="font-size: 1.5rem; font-weight: 700;">Active Sessions & Devices</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Review and revoke access across all browsers and devices logged into your account.</p>
+      </div>
+
+      <form method="POST" action="{% url 'accounts:terminate_other_sessions' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Sign out of all other devices?');">
+          Sign Out All Other Devices
+        </button>
+      </form>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      {% for s in sessions %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: rgba(0,0,0,0.3); border-radius: var(--border-radius-md); border: 1px solid var(--border-glass);">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="font-size: 2rem;">
+            {% if 'Mobile' in s.device_type %}📱{% elif 'Tablet' in s.device_type %}📟{% else %}💻{% endif %}
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-weight: 700; font-size: 1rem;">{{ s.device_type }}</span>
+              {% if s.session_key == current_session_key %}
+              <span class="badge badge-verified">Current Session</span>
+              {% endif %}
+            </div>
+            <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">
+              IP: {{ s.ip_address|default:"127.0.0.1" }} • {{ s.location_city|default:"Unknown City" }} • Last seen {{ s.last_activity|timesince }} ago
+            </div>
+            <div style="color: var(--text-dim); font-size: 0.75rem; margin-top: 2px;">
+              {{ s.user_agent|truncatechars:70 }}
+            </div>
+          </div>
+        </div>
+
+        {% if s.session_key != current_session_key %}
+        <form method="POST" action="{% url 'accounts:terminate_session' s.session_key %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-secondary btn-sm" style="color: #ef4444;">Revoke</button>
+        </form>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

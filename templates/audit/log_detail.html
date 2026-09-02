@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Audit Event Inspector — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+  <div class="glass-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass);">
+      <div>
+        <h2 style="font-size: 1.4rem; font-weight: 700;">Audit Event {{ log.id }}</h2>
+        <p style="color: var(--text-muted); font-size: 0.88rem;">Recorded at {{ log.timestamp|date:"Y-m-d H:i:s T" }}</p>
+      </div>
+      <a href="{% url 'audit:log_list' %}" class="btn btn-secondary btn-sm">← Back to Log List</a>
+    </div>
+
+    <!-- Metadata Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+      <div style="padding: 14px; background: rgba(0,0,0,0.3); border-radius: var(--border-radius-sm);">
+        <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Action Type</div>
+        <div style="font-weight: 700; font-size: 1.1rem; color: var(--text-main); margin-top: 4px;">{{ log.action_type }}</div>
+      </div>
+      <div style="padding: 14px; background: rgba(0,0,0,0.3); border-radius: var(--border-radius-sm);">
+        <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Severity & Category</div>
+        <div style="margin-top: 4px; display: flex; gap: 8px;">
+          <span class="badge badge-verified">{{ log.category }}</span>
+          <span class="badge badge-premium">{{ log.severity }}</span>
+        </div>
+      </div>
+      <div style="padding: 14px; background: rgba(0,0,0,0.3); border-radius: var(--border-radius-sm);">
+        <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Actor Details</div>
+        <div style="color: var(--text-main); margin-top: 4px;">{{ log.actor_email|default:"System Event" }} (Role: {{ log.actor_role }})</div>
+      </div>
+      <div style="padding: 14px; background: rgba(0,0,0,0.3); border-radius: var(--border-radius-sm);">
+        <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Client Telemetry</div>
+        <div style="color: var(--text-main); margin-top: 4px; font-family: monospace; font-size: 0.85rem;">IP: {{ log.ip_address }} • Method: {{ log.request_method }}</div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Description</h3>
+      <p style="color: var(--text-main); background: rgba(0,0,0,0.25); padding: 14px; border-radius: var(--border-radius-sm);">{{ log.description }}</p>
+    </div>
+
+    <!-- SHA-256 Signature -->
+    <div>
+      <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Cryptographic Signature (SHA-256)</h3>
+      <div style="font-family: monospace; font-size: 0.85rem; padding: 12px; background: rgba(0,0,0,0.4); border: 1px dashed var(--border-glass); border-radius: var(--border-radius-sm); color: var(--accent-cyan); word-break: break-all;">
+        {{ log.signature|default:"Verified Immutable Digest" }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

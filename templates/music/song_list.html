@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Explore Audio Masters — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 1240px; margin: 0 auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+      <h1 style="font-size: 1.8rem; font-weight: 800;">Audio Master Catalog</h1>
+      <p style="color: var(--text-muted); font-size: 0.92rem;">Stream Hi-Fi master tracks, filter by genres, and discover underground releases.</p>
+    </div>
+
+    {% if user.is_authenticated and user.is_artist_user %}
+    <a href="{% url 'music:upload' %}" class="btn btn-primary">⚡ Upload New Master</a>
+    {% endif %}
+  </div>
+
+  <!-- Filters & Sort Header -->
+  <div class="glass-panel" style="padding: 16px 20px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+    <div style="display: flex; gap: 10px; overflow-x: auto; max-width: 75%;">
+      <a href="{% url 'music:song_list' %}" class="btn {% if not current_genre %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">All Genres</a>
+      {% for g in genres %}
+      <a href="?genre={{ g.slug }}" class="btn {% if current_genre == g.slug %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+        {{ g.name }}
+      </a>
+      {% endfor %}
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+      <a href="?sort=newest{% if current_genre %}&genre={{ current_genre }}{% endif %}" class="btn {% if current_sort == 'newest' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">Newest</a>
+      <a href="?sort=popular{% if current_genre %}&genre={{ current_genre }}{% endif %}" class="btn {% if current_sort == 'popular' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">Popular</a>
+    </div>
+  </div>
+
+  <!-- Tracks Grid -->
+  <div class="media-grid">
+    {% for song in songs %}
+    <div class="music-card" onclick="window.location.href='{% url 'music:song_detail' song.id %}'">
+      <div style="position: relative;">
+        <img src="{{ song.cover_art_url }}" class="music-card-cover" alt="{{ song.title }}">
+        {% if song.is_premium_only %}
+        <span class="badge badge-lossless" style="position: absolute; top: 8px; right: 8px; font-size: 0.65rem;">HI-RES</span>
+        {% endif %}
+      </div>
+      <div class="music-card-title">{{ song.title }}</div>
+      <div class="music-card-artist">{{ song.artist.name }}</div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.75rem; color: var(--text-dim);">
+        <span>{{ song.genre.name|default:"Electronic" }}</span>
+        <span>{{ song.formatted_duration }}</span>
+      </div>
+    </div>
+    {% empty %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: var(--text-dim);">
+      🎵 No tracks found in this category.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

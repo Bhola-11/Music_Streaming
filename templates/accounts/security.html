@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Security & Authentication — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 860px; margin: 0 auto;">
+  <div class="glass-panel" style="margin-bottom: 28px;">
+    <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass);">
+      <h2 style="font-size: 1.5rem; font-weight: 700;">Account Security Center</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Manage passwords, two-factor authentication, and connected devices.</p>
+    </div>
+
+    <!-- 2FA Section -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.3); border-radius: var(--border-radius-md); margin-bottom: 28px;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 2.2rem;">{% if has_2fa %}🛡️{% else %}⚠️{% endif %}</div>
+        <div>
+          <h3 style="font-size: 1.1rem; font-weight: 600;">Two-Factor Authentication (2FA)</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">
+            {% if has_2fa %}
+            Your account is shielded with TOTP authenticator protection.
+            {% else %}
+            Add an extra layer of defense against unauthorized logins.
+            {% endif %}
+          </p>
+        </div>
+      </div>
+
+      <div>
+        {% if has_2fa %}
+        <form method="POST" action="{% url 'accounts:two_factor_disable' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to disable 2FA?');">Disable 2FA</button>
+        </form>
+        {% else %}
+        <a href="{% url 'accounts:two_factor_setup' %}" class="btn btn-primary btn-sm">Enable 2FA</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Change Password Form -->
+    <div style="margin-bottom: 28px;">
+      <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--accent-cyan); margin-bottom: 16px;">Change Password</h3>
+      <form method="POST">
+        {% csrf_token %}
+        <div style="display: flex; flex-direction: column; gap: 16px; max-width: 480px;">
+          <div class="form-group">
+            <label class="form-label">Current Password</label>
+            {{ password_form.old_password }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            {{ password_form.new_password1 }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm New Password</label>
+            {{ password_form.new_password2 }}
+          </div>
+          <button type="submit" class="btn btn-primary" style="align-self: flex-start;">Update Password</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Active Sessions Overview -->
+    <div style="border-top: 1px solid var(--border-glass); padding-top: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.1rem; font-weight: 600;">Active Device Sessions</h3>
+        <a href="{% url 'accounts:sessions' %}" class="btn btn-secondary btn-sm">Manage Sessions</a>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for s in sessions %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: var(--border-radius-sm);">
+          <div>
+            <div style="font-weight: 600; font-size: 0.95rem;">{{ s.device_type }}</div>
+            <div style="color: var(--text-dim); font-size: 0.8rem;">IP: {{ s.ip_address }} • Last active {{ s.last_activity|timesince }} ago</div>
+          </div>
+          {% if s.session_key == request.session.session_key %}
+          <span class="badge badge-verified">This Device</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

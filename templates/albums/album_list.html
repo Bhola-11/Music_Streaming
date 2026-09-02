@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Albums & Discography — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 1240px; margin: 0 auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+      <h1 style="font-size: 1.8rem; font-weight: 800;">Albums & Discographies</h1>
+      <p style="color: var(--text-muted); font-size: 0.92rem;">Full-length studio LPs, EPs, live recordings, and remastered discographies.</p>
+    </div>
+
+    {% if user.is_authenticated and user.is_artist_user %}
+    <a href="{% url 'albums:create' %}" class="btn btn-primary">💿 Create New Album</a>
+    {% endif %}
+  </div>
+
+  <!-- Type Filters -->
+  <div class="glass-panel" style="padding: 14px 20px; margin-bottom: 28px; display: flex; gap: 10px;">
+    <a href="{% url 'albums:list' %}" class="btn {% if not request.GET.type %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">All Releases</a>
+    <a href="?type=lp" class="btn {% if request.GET.type == 'lp' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">Studio Albums (LP)</a>
+    <a href="?type=ep" class="btn {% if request.GET.type == 'ep' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">EPs</a>
+    <a href="?type=single" class="btn {% if request.GET.type == 'single' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">Singles</a>
+  </div>
+
+  <div class="media-grid">
+    {% for album in albums %}
+    <div class="music-card" onclick="window.location.href='{% url 'albums:detail' album.slug %}'">
+      <img src="{{ album.cover_art_url }}" class="music-card-cover" alt="{{ album.title }}">
+      <div class="music-card-title">{{ album.title }}</div>
+      <div class="music-card-artist">{{ album.artist.name }}</div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.75rem; color: var(--text-dim);">
+        <span>{{ album.get_album_type_display }}</span>
+        <span>{{ album.release_date|date:"Y"|default:"2026" }}</span>
+      </div>
+    </div>
+    {% empty %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: var(--text-dim);">
+      💿 No albums released in this category yet.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

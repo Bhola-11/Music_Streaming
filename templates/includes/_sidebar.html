@@ -1,0 +1,78 @@
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="brand-logo-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#060810" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18V5l12-2v13"></path>
+        <circle cx="6" cy="18" r="3"></circle>
+        <circle cx="18" cy="16" r="3"></circle>
+      </svg>
+    </div>
+    <span class="brand-title">MusicVerse</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">Discover</div>
+    <a href="{% url 'home' %}" class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+      <span class="nav-icon">🏠</span>
+      <span>Home Hub</span>
+    </a>
+    <a href="{% url 'discovery:hub' %}" class="nav-item {% if 'discovery' in request.path and request.resolver_match.url_name != 'search' %}active{% endif %}">
+      <span class="nav-icon">🌌</span>
+      <span>Explore & Charts</span>
+    </a>
+    <a href="{% url 'recommendations:feed' %}" class="nav-item {% if 'recommendations' in request.path %}active{% endif %}">
+      <span class="nav-icon">✨</span>
+      <span>Made For You</span>
+    </a>
+
+    <div class="nav-section-title">Library</div>
+    <a href="{% url 'music:song_list' %}" class="nav-item {% if 'music/songs' in request.path %}active{% endif %}">
+      <span class="nav-icon">🎵</span>
+      <span>Songs & Masters</span>
+    </a>
+    <a href="{% url 'albums:list' %}" class="nav-item {% if 'albums' in request.path %}active{% endif %}">
+      <span class="nav-icon">💿</span>
+      <span>Albums</span>
+    </a>
+    <a href="{% url 'artists:list' %}" class="nav-item {% if 'artists' in request.path and 'studio' not in request.path %}active{% endif %}">
+      <span class="nav-icon">🎤</span>
+      <span>Artists</span>
+    </a>
+    <a href="{% url 'playlists:list' %}" class="nav-item {% if 'playlists' in request.path %}active{% endif %}">
+      <span class="nav-icon">📑</span>
+      <span>Playlists</span>
+    </a>
+
+    {% if user.is_authenticated and user.is_artist_user %}
+    <div class="nav-section-title">Creator Studio</div>
+    <a href="{% url 'artists:dashboard' %}" class="nav-item {% if 'studio' in request.path %}active{% endif %}">
+      <span class="nav-icon">⚡</span>
+      <span>Artist Dashboard</span>
+    </a>
+    {% endif %}
+
+    {% if user.is_staff or user.is_superuser %}
+    <div class="nav-section-title">Administration</div>
+    <a href="{% url 'audit:dashboard' %}" class="nav-item {% if 'audit' in request.path %}active{% endif %}">
+      <span class="nav-icon">🛡️</span>
+      <span>Security & Audit</span>
+    </a>
+    <a href="{% url 'moderation:queue' %}" class="nav-item {% if 'moderation' in request.path %}active{% endif %}">
+      <span class="nav-icon">⚖️</span>
+      <span>Moderation Queue</span>
+    </a>
+    <a href="{% url 'analytics:dashboard' %}" class="nav-item {% if 'analytics' in request.path %}active{% endif %}">
+      <span class="nav-icon">📊</span>
+      <span>Global Analytics</span>
+    </a>
+    {% endif %}
+  </nav>
+
+  <div style="padding: 16px 20px; border-top: 1px solid var(--border-glass);">
+    {% if user.is_authenticated and not user.is_premium %}
+    <a href="{% url 'subscriptions:plans' %}" class="btn btn-primary" style="width: 100%; font-size: 0.85rem; padding: 8px 12px;">
+      ⚡ Upgrade to Hi-Fi
+    </a>
+    {% endif %}
+  </div>
+</aside>

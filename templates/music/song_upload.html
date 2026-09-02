@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Audio Master — Creator Studio{% endblock %}
+
+{% block content %}
+<div style="max-width: 820px; margin: 0 auto;">
+  <div class="glass-panel">
+    <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass);">
+      <h2 style="font-size: 1.6rem; font-weight: 800;">Upload Track Master</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Upload FLAC, WAV, or 320 kbps MP3. Metadata and waveforms are processed automatically.</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label class="form-label">Audio Master File (Max 150 MB)</label>
+        {{ form.audio_file }}
+        <p class="form-help-text">Supported: .flac, .wav, .mp3, .aac, .ogg, .m4a</p>
+        {% if form.audio_file.errors %}<div class="form-error-msg">{{ form.audio_file.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Track Title</label>
+        {{ form.title }}
+        <p class="form-help-text">Leave blank to auto-detect from ID3 tags.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+          <label class="form-label">Primary Genre</label>
+          {{ form.genre }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cover Artwork</label>
+          {{ form.cover_art }}
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+          <label class="form-label">Tempo (BPM)</label>
+          {{ form.bpm }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Musical Key</label>
+          {{ form.musical_key }}
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+          <label class="form-label">ISRC Code (Optional)</label>
+          {{ form.isrc_code }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Copyright Notice</label>
+          {{ form.copyright_line }}
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 24px; margin: 20px 0;">
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+          {{ form.is_premium_only }} Exclusive to Hi-Fi Pro Subscribers
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+          {{ form.is_explicit }} Explicit Lyrics
+        </label>
+      </div>
+
+      <div style="display: flex; gap: 16px; margin-top: 28px;">
+        <button type="submit" class="btn btn-primary" style="padding: 12px 32px;">Process & Publish Master</button>
+        <a href="{% url 'artists:dashboard' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

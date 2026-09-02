@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ object.title }} — Creator Studio{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+  <div class="glass-panel">
+    <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass);">
+      <h2 style="font-size: 1.5rem; font-weight: 700;">Edit Album Release</h2>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label class="form-label">Album Title</label>
+        {{ form.title }}
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+          <label class="form-label">Release Type</label>
+          {{ form.album_type }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Update Cover Art</label>
+          {{ form.cover_art }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Liner Notes</label>
+        {{ form.description }}
+      </div>
+
+      <div style="display: flex; gap: 20px; margin: 20px 0;">
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+          {{ form.is_published }} Published
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+          {{ form.is_explicit }} Explicit Content
+        </label>
+      </div>
+
+      <div style="display: flex; gap: 16px; margin-top: 28px;">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'albums:detail' object.slug %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

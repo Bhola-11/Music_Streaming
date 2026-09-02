@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}MusicVerse — Stream Beyond Dimensions{% endblock %}
+
+{% block content %}
+<div style="max-width: 1240px; margin: 0 auto;">
+  <!-- Cosmic Hero Banner -->
+  <div class="glass-panel" style="background: linear-gradient(135deg, rgba(123,44,191,0.4), rgba(0,245,212,0.15)), rgba(18,20,32,0.8); padding: 48px; border-radius: var(--border-radius-lg); margin-bottom: 40px; position: relative; overflow: hidden;">
+    <div style="max-width: 640px; position: relative; z-index: 2;">
+      <span class="badge badge-verified" style="margin-bottom: 16px;">Next-Gen Audio Stream Engine</span>
+      <h1 style="font-size: 2.8rem; font-weight: 800; line-height: 1.15; margin-bottom: 16px; background: linear-gradient(90deg, #FFFFFF, var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Stream Beyond Dimensions.
+      </h1>
+      <p style="color: var(--text-muted); font-size: 1.1rem; line-height: 1.6; margin-bottom: 28px;">
+        Lossless 1411 kbps audio, dynamic 3D WebGL reactive visualizers, collaborative playlists, and direct creator monetization.
+      </p>
+      
+      <div style="display: flex; gap: 16px;">
+        <a href="{% url 'music:song_list' %}" class="btn btn-primary btn-lg">🎧 Start Listening</a>
+        <a href="{% url 'subscriptions:plans' %}" class="btn btn-secondary btn-lg">⚡ View Hi-Fi Plans</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Featured Tracks Grid -->
+  <div style="margin-bottom: 40px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div>
+        <h2 style="font-size: 1.4rem; font-weight: 700;">Trending Tracks</h2>
+        <p style="color: var(--text-dim); font-size: 0.85rem;">Most streamed tracks across the MusicVerse cluster</p>
+      </div>
+      <a href="{% url 'music:song_list' %}" class="btn btn-secondary btn-sm">See All Tracks</a>
+    </div>
+
+    <div class="media-grid">
+      {% for song in featured_songs %}
+      <div class="music-card" onclick="window.location.href='{% url 'music:song_detail' song.id %}'">
+        <img src="{{ song.cover_art.url|default:'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80' }}" class="music-card-cover">
+        <div class="music-card-title">{{ song.title }}</div>
+        <div class="music-card-artist">{{ song.artist.name }}</div>
+      </div>
+      {% empty %}
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-dim);">
+        🎵 New audio tracks are syncing to the catalog. Check back shortly!
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Top Artists Section -->
+  <div style="margin-bottom: 40px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div>
+        <h2 style="font-size: 1.4rem; font-weight: 700;">Spotlight Creators</h2>
+        <p style="color: var(--text-dim); font-size: 0.85rem;">Verified artists producing exclusive master releases</p>
+      </div>
+      <a href="{% url 'artists:list' %}" class="btn btn-secondary btn-sm">Discover Artists</a>
+    </div>
+
+    <div class="media-grid">
+      {% for artist in trending_artists %}
+      <div class="music-card" style="text-align: center;" onclick="window.location.href='{% url 'artists:detail' artist.slug %}'">
+        <img src="{{ artist.avatar_display }}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin: 0 auto 12px auto; display: block; box-shadow: 0 4px 14px rgba(0,0,0,0.5);">
+        <div class="music-card-title">{{ artist.name }}</div>
+        <div class="music-card-artist">{{ artist.monthly_listeners }} listeners</div>
+      </div>
+      {% empty %}
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-dim);">
+        🎤 Featured artists will appear here.
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

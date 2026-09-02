@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MusicVerse — Stream Beyond Dimensions{% endblock %}</title>
+  
+  <!-- Modern Typography (Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- Three.js for 3D Audio Visualizations and Particle Meshes -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="{% static 'css/musicverse.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body data-theme="{{ ACTIVE_THEME }}">
+  <!-- 3D WebGL Canvas Layer -->
+  <canvas id="webgl-background-canvas"></canvas>
+
+  <!-- Toast Notification Dispatcher -->
+  {% include 'includes/_toasts.html' %}
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    {% include 'includes/_sidebar.html' %}
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+      {% include 'includes/_navbar.html' %}
+
+      <main class="content-body">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <!-- Global Audio Player Component -->
+  {% include 'includes/_player_bar.html' %}
+
+  <!-- Core JavaScript Framework -->
+  <script src="{% static 'js/toast.js' %}"></script>
+  <script src="{% static 'js/three_background.js' %}"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

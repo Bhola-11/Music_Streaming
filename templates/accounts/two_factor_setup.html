@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Setup Two-Factor Authentication — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 720px; margin: 0 auto;">
+  <div class="glass-panel">
+    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass);">
+      <div style="font-size: 2.2rem;">🔐</div>
+      <div>
+        <h2 style="font-size: 1.5rem; font-weight: 700;">Enable Two-Factor Authentication (TOTP)</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Protect your artist royalties, playlists, and account data with an authenticator app.</p>
+      </div>
+    </div>
+
+    <!-- Step 1: Scan / Secret Key -->
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--accent-cyan); margin-bottom: 8px;">Step 1: Scan QR or Enter Secret Key</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">Open Google Authenticator, 1Password, or Authy and enter this key manually:</p>
+      
+      <div style="padding: 14px 20px; background: rgba(0, 0, 0, 0.4); border: 1px dashed var(--border-glass); border-radius: var(--border-radius-md); font-family: monospace; font-size: 1.2rem; letter-spacing: 2px; color: var(--accent-cyan); text-align: center; word-break: break-all;">
+        {{ secret_key }}
+      </div>
+    </div>
+
+    <!-- Step 2: Emergency Backup Codes -->
+    <div style="margin-bottom: 28px;">
+      <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--accent-pink); margin-bottom: 8px;">Step 2: Save Emergency Recovery Codes</h3>
+      <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 12px;">Store these 8 single-use codes in a safe place. If you lose your authenticator, each code can be used once to access your account:</p>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px; background: rgba(0, 0, 0, 0.4); border-radius: var(--border-radius-md);">
+        {% for code in backup_codes %}
+        <div style="font-family: monospace; color: var(--text-main); font-size: 0.95rem; text-align: center; padding: 6px; background: rgba(255, 255, 255, 0.05); border-radius: 4px;">
+          {{ code }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Step 3: Verify Token -->
+    <div>
+      <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--status-success); margin-bottom: 8px;">Step 3: Confirm 6-Digit Code</h3>
+      <form method="POST" action="{% url 'accounts:two_factor_setup' %}">
+        {% csrf_token %}
+        <div class="form-group">
+          {{ form.code }}
+          {% if form.code.errors %}
+            <div class="form-error-msg">{{ form.code.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div style="display: flex; gap: 14px; margin-top: 20px;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Activate 2FA Protection</button>
+          <a href="{% url 'accounts:security' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ song.title }} by {{ song.artist.name }} — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto;">
+  <!-- Song Banner Card -->
+  <div class="glass-panel" style="display: flex; gap: 32px; align-items: center; margin-bottom: 32px; padding: 32px;">
+    <img src="{{ song.cover_art_url }}" alt="{{ song.title }}" style="width: 220px; height: 220px; border-radius: var(--border-radius-md); object-fit: cover; box-shadow: var(--shadow-card);">
+    
+    <div style="flex: 1;">
+      <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+        <span class="badge badge-verified">{{ song.genre.name|default:"Track" }}</span>
+        {% if song.is_premium_only %}
+        <span class="badge badge-premium">Hi-Fi FLAC</span>
+        {% endif %}
+        {% if song.is_explicit %}
+        <span class="badge badge-lossless">EXPLICIT</span>
+        {% endif %}
+      </div>
+
+      <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 6px;">{{ song.title }}</h1>
+      <h3 style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 16px;">
+        By <a href="{% url 'artists:detail' song.artist.slug %}" style="color: var(--accent-cyan); text-decoration: none;">{{ song.artist.name }}</a>
+      </h3>
+
+      <div style="display: flex; gap: 20px; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 24px;">
+        <span>⏱ {{ song.formatted_duration }}</span>
+        <span>🎧 {{ song.bitrate_kbps }} kbps / {{ song.sample_rate_hz }} Hz</span>
+        <span>▶ {{ song.play_count }} streams</span>
+      </div>
+
+      <div style="display: flex; gap: 14px; align-items: center;">
+        <button class="btn btn-primary" onclick="playSong('{{ song.id }}', '{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', '{{ song.cover_art_url|escapejs }}', '{% url 'music:stream' song.id %}')">
+          ▶ Play Master
+        </button>
+        {% if user.is_authenticated and user == song.artist.user %}
+        <a href="{% url 'music:song_edit' song.id %}" class="btn btn-secondary">✏️ Edit Metadata</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Waveform Display -->
+  <div class="glass-panel" style="margin-bottom: 32px;">
+    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; color: var(--accent-cyan);">Audio Waveform Energy</h3>
+    <div id="waveform-container" style="display: flex; align-items: center; gap: 3px; height: 70px; padding: 10px; background: rgba(0,0,0,0.4); border-radius: var(--border-radius-sm);">
+      {% for peak in song.waveform_data %}
+      <div style="flex: 1; height: {{ peak|floatformat:2|stringformat:'s' }}%; max-height: 100%; min-height: 8%; background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple)); border-radius: 2px;"></div>
+      {% empty %}
+      <div style="flex: 1; text-align: center; color: var(--text-dim); font-size: 0.85rem;">Waveform rendered at playback.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Lyrics & Credits Section -->
+  <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 28px;">
+    <!-- Lyrics -->
+    <div class="glass-panel">
+      <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 16px;">Lyrics</h3>
+      {% if lyrics and lyrics.plain_lyrics %}
+      <div style="white-space: pre-line; color: var(--text-muted); font-size: 0.95rem; line-height: 1.8;">
+        {{ lyrics.plain_lyrics }}
+      </div>
+      {% if lyrics.writer_credit %}
+      <div style="margin-top: 16px; font-size: 0.8rem; color: var(--text-dim);">Written by: {{ lyrics.writer_credit }}</div>
+      {% endif %}
+      {% else %}
+      <p style="color: var(--text-dim); font-size: 0.9rem;">No lyrics uploaded for this track.</p>
+      {% endif %}
+    </div>
+
+    <!-- Track Credits & Comments -->
+    <div>
+      <div class="glass-panel" style="margin-bottom: 24px;">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 16px;">Credits & Production</h3>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-size: 0.88rem;"><strong>Artist:</strong> {{ song.artist.name }}</div>
+          {% if song.album %}
+          <div style="font-size: 0.88rem;"><strong>Album:</strong> {{ song.album.title }}</div>
+          {% endif %}
+          {% if song.bpm %}
+          <div style="font-size: 0.88rem;"><strong>Tempo:</strong> {{ song.bpm }} BPM</div>
+          {% endif %}
+          {% if song.musical_key %}
+          <div style="font-size: 0.88rem;"><strong>Key:</strong> {{ song.musical_key }}</div>
+          {% endif %}
+          {% if song.copyright_line %}
+          <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 8px;">{{ song.copyright_line }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Comments Feed -->
+      <div class="glass-panel">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 16px;">Listener Reactions</h3>
+        
+        {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'music:add_comment' song.id %}" style="margin-bottom: 20px;">
+          {% csrf_token %}
+          <div style="display: flex; gap: 8px;">
+            {{ comment_form.comment_text }}
+            <button type="submit" class="btn btn-primary btn-sm">Post</button>
+          </div>
+        </form>
+        {% endif %}
+
+        <div style="display: flex; flex-direction: column; gap: 12px; max-height: 280px; overflow-y: auto;">
+          {% for c in comments %}
+          <div style="padding: 10px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm);">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-dim);">
+              <span style="font-weight: 600; color: var(--text-main);">{{ c.user.username }}</span>
+              <span>{{ c.created_at|timesince }} ago</span>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">{{ c.comment_text }}</div>
+          </div>
+          {% empty %}
+          <p style="color: var(--text-dim); font-size: 0.85rem;">Be the first to react to this track!</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

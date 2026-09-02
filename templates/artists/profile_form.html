@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Artist Profile Setup — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 820px; margin: 0 auto;">
+  <div class="glass-panel">
+    <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass);">
+      <h2 style="font-size: 1.6rem; font-weight: 800;">{% if artist %}Edit Artist Profile{% else %}Create Artist Profile{% endif %}</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Your public artist identity across the MusicVerse platform.</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+          <label class="form-label">Artist / Band Name</label>
+          {{ form.name }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stage Name (Optional)</label>
+          {{ form.stage_name }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Artist Biography</label>
+        {{ form.bio }}
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+          <label class="form-label">Genres (comma-separated)</label>
+          {{ form.genres }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Country of Origin</label>
+          {{ form.country_of_origin }}
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+          <label class="form-label">Profile Avatar (1:1 Square)</label>
+          {{ form.avatar }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Header Banner (16:9)</label>
+          {{ form.header_banner }}
+        </div>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid var(--border-glass); margin: 20px 0;">
+      <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 14px; color: var(--text-muted);">SOCIAL & STREAMING LINKS</h4>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+          <label class="form-label">Official Website</label>
+          {{ form.website }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Spotify Artist ID</label>
+          {{ form.spotify_id }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">YouTube Channel</label>
+          {{ form.youtube_channel }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Instagram Handle</label>
+          {{ form.instagram_handle }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Twitter/X Handle</label>
+          {{ form.twitter_handle }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">SoundCloud Profile</label>
+          {{ form.soundcloud_id }}
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 16px; margin-top: 28px;">
+        <button type="submit" class="btn btn-primary" style="padding: 12px 32px;">Save Artist Profile</button>
+        <a href="{% url 'artists:dashboard' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

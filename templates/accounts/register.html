@@ -1,0 +1,76 @@
+{% extends 'auth_base.html' %}
+
+{% block title %}Create Account — MusicVerse{% endblock %}
+
+{% block auth_content %}
+<div style="margin-bottom: 28px;">
+  <h2 style="font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Start Streaming</h2>
+  <p style="color: var(--text-muted); font-size: 0.95rem;">Join the global music streaming & creator ecosystem.</p>
+</div>
+
+<form method="POST" action="{% url 'accounts:register' %}">
+  {% csrf_token %}
+
+  <div class="form-group">
+    <label class="form-label">Account Goal</label>
+    <div style="display: flex; gap: 16px; margin-top: 6px;">
+      {% for radio in form.account_type %}
+      <label style="display: flex; align-items: center; gap: 6px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+        {{ radio.tag }} {{ radio.choice_label }}
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="id_username">Username</label>
+    {{ form.username }}
+    {% if form.username.errors %}
+      <div class="form-error-msg">{{ form.username.errors.0 }}</div>
+    {% endif %}
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="id_email">Email Address</label>
+    {{ form.email }}
+    {% if form.email.errors %}
+      <div class="form-error-msg">{{ form.email.errors.0 }}</div>
+    {% endif %}
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="id_password">Password</label>
+    {{ form.password }}
+    {% if form.password.errors %}
+      <div class="form-error-msg">{{ form.password.errors.0 }}</div>
+    {% endif %}
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="id_password_confirm">Confirm Password</label>
+    {{ form.password_confirm }}
+    {% if form.password_confirm.errors %}
+      <div class="form-error-msg">{{ form.password_confirm.errors.0 }}</div>
+    {% endif %}
+  </div>
+
+  <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 24px;">
+    {{ form.terms_accepted }}
+    <label for="id_terms_accepted" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+      I agree to the <a href="#" style="color: var(--accent-cyan); text-decoration: none;">Terms of Service</a> and <a href="#" style="color: var(--accent-cyan); text-decoration: none;">Privacy Policy</a>.
+    </label>
+  </div>
+  {% if form.terms_accepted.errors %}
+    <div class="form-error-msg" style="margin-bottom: 16px;">{{ form.terms_accepted.errors.0 }}</div>
+  {% endif %}
+
+  <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem;">
+    Create Free Account
+  </button>
+</form>
+
+<div style="margin-top: 24px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+  Already have an account? 
+  <a href="{% url 'accounts:login' %}" style="color: var(--accent-cyan); font-weight: 600; text-decoration: none;">Sign In</a>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ album.title }} by {{ album.artist.name }} — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto;">
+  <!-- Album Header Card -->
+  <div class="glass-panel" style="display: flex; gap: 32px; align-items: flex-end; margin-bottom: 32px; padding: 32px;">
+    <img src="{{ album.cover_art_url }}" alt="{{ album.title }}" style="width: 240px; height: 240px; border-radius: var(--border-radius-md); object-fit: cover; box-shadow: var(--shadow-card);">
+
+    <div style="flex: 1;">
+      <span class="badge badge-verified" style="margin-bottom: 8px;">{{ album.get_album_type_display }}</span>
+      <h1 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 6px;">{{ album.title }}</h1>
+      <h3 style="font-size: 1.15rem; color: var(--text-muted); margin-bottom: 16px;">
+        By <a href="{% url 'artists:detail' album.artist.slug %}" style="color: var(--accent-cyan); text-decoration: none;">{{ album.artist.name }}</a>
+      </h3>
+
+      <div style="display: flex; gap: 20px; font-size: 0.88rem; color: var(--text-dim); margin-bottom: 24px;">
+        <span>📅 {{ album.release_date|date:"F j, Y"|default:"2026" }}</span>
+        <span>🎵 {{ tracks|length }} tracks</span>
+        <span>⏱ {{ album.formatted_total_duration }}</span>
+      </div>
+
+      <div style="display: flex; gap: 14px;">
+        {% if tracks %}
+        <button class="btn btn-primary" onclick="playSong('{{ tracks.0.song.id }}', '{{ tracks.0.song.title|escapejs }}', '{{ tracks.0.song.artist.name|escapejs }}', '{{ tracks.0.song.cover_art_url|escapejs }}', '{% url 'music:stream' tracks.0.song.id %}')">
+          ▶ Play Album
+        </button>
+        {% endif %}
+        {% if user.is_authenticated and user == album.artist.user %}
+        <a href="{% url 'albums:edit' album.slug %}" class="btn btn-secondary">✏️ Edit Album</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Tracklist -->
+  <div class="glass-panel" style="margin-bottom: 32px;">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 16px;">Tracklist</h3>
+    
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      {% for item in tracks %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); transition: background 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span style="font-weight: 700; color: var(--text-dim); width: 20px; text-align: center;">{{ item.track_number }}</span>
+          <div>
+            <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">{{ item.song.title }}</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">{{ item.song.artist.name }}</div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 18px;">
+          <span style="font-size: 0.85rem; color: var(--text-dim);">{{ item.song.formatted_duration }}</span>
+          <button class="btn btn-secondary btn-sm" onclick="playSong('{{ item.song.id }}', '{{ item.song.title|escapejs }}', '{{ item.song.artist.name|escapejs }}', '{{ item.song.cover_art_url|escapejs }}', '{% url 'music:stream' item.song.id %}')">
+            ▶
+          </button>
+        </div>
+      </div>
+      {% empty %}
+      <p style="color: var(--text-dim); font-size: 0.9rem; padding: 20px; text-align: center;">No tracks added to this album yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Reviews Section -->
+  <div class="glass-panel">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 20px;">Critic & Community Reviews</h3>
+    
+    {% if user.is_authenticated %}
+    <form method="POST" action="{% url 'albums:add_review' album.slug %}" style="margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid var(--border-glass);">
+      {% csrf_token %}
+      <div style="display: flex; gap: 16px; margin-bottom: 14px;">
+        <div style="width: 140px;">
+          <label class="form-label">Score</label>
+          {{ review_form.rating }}
+        </div>
+        <div style="flex: 1;">
+          <label class="form-label">Review Headline</label>
+          {{ review_form.title }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Critique</label>
+        {{ review_form.body }}
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">Post Album Review</button>
+    </form>
+    {% endif %}
+
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      {% for rev in reviews %}
+      <div style="padding: 16px; background: rgba(0,0,0,0.3); border-radius: var(--border-radius-sm); border: 1px solid var(--border-glass);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="badge badge-premium">{{ rev.rating }}/10</span>
+            <span style="font-weight: 700; font-size: 1rem;">{{ rev.title }}</span>
+          </div>
+          <span style="font-size: 0.8rem; color: var(--text-dim);">By {{ rev.user.username }} • {{ rev.created_at|timesince }} ago</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">{{ rev.body }}</p>
+      </div>
+      {% empty %}
+      <p style="color: var(--text-dim); font-size: 0.9rem; text-align: center; padding: 20px;">No reviews published yet. Be the first to critique!</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Audio & Visual Preferences — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+  <div class="glass-panel">
+    <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass);">
+      <h2 style="font-size: 1.5rem; font-weight: 700;">Audio & Visual Preferences</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Fine-tune your audio streaming fidelity, 3D WebGL visualizers, and UI theme.</p>
+    </div>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <!-- Audio Section -->
+      <div style="margin-bottom: 28px;">
+        <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--accent-cyan); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <span>🎧</span> Streaming Audio Engine
+        </h3>
+        
+        <div class="form-group">
+          <label class="form-label">Streaming Audio Quality</label>
+          {{ form.audio_quality }}
+          <p class="form-help-text">Lossless 1411 kbps FLAC is available exclusively on Pro plans.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Equalizer Acoustic Preset</label>
+          {{ form.equalizer_preset }}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+            {{ form.normalize_volume }} ReplayGain Volume Normalization
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+            {{ form.gapless_playback }} Gapless Audio Transition
+          </label>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px; margin-top: 16px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+            {{ form.enable_crossfade }} Enable Song Crossfade
+          </label>
+          <div style="width: 140px;">
+            {{ form.crossfade_seconds }}
+          </div>
+        </div>
+      </div>
+
+      <!-- 3D Visualizer Section -->
+      <div style="margin-bottom: 28px; border-top: 1px solid var(--border-glass); padding-top: 20px;">
+        <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--accent-purple); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <span>🌌</span> 3D WebGL Audio Visualizer
+        </h3>
+
+        <div class="form-group">
+          <label class="form-label">Default 3D Visualizer Mode</label>
+          {{ form.visualizer_mode }}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Interface Color Theme</label>
+          {{ form.theme }}
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div style="margin-bottom: 28px; border-top: 1px solid var(--border-glass); padding-top: 20px;">
+        <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--accent-pink); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <span>🔔</span> Email & Notification Dispatch
+        </h3>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+            {{ form.email_on_new_release }} Email me when artists I follow release new tracks
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+            {{ form.email_on_playlist_like }} Email me when someone likes or follows my playlists
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+            {{ form.email_newsletter }} Send weekly curated music digests and trending charts
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="padding: 12px 32px;">Save All Preferences</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

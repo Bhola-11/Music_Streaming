@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ artist.name }} — MusicVerse Artist Profile{% endblock %}
+
+{% block content %}
+<div style="max-width: 1180px; margin: 0 auto;">
+  <!-- Artist Header Banner -->
+  <div class="glass-panel" style="padding: 0; overflow: hidden; margin-bottom: 32px;">
+    <div style="height: 280px; background: linear-gradient(180deg, rgba(10,11,16,0.2) 0%, rgba(10,11,16,0.95) 100%), url('{{ artist.banner_display }}') center/cover; display: flex; align-items: flex-end; padding: 32px;">
+      <div style="display: flex; align-items: flex-end; gap: 28px; width: 100%;">
+        <img src="{{ artist.avatar_display }}" alt="{{ artist.name }}" style="width: 140px; height: 140px; border-radius: 50%; border: 4px solid var(--bg-primary); object-fit: cover; box-shadow: var(--shadow-card);">
+        
+        <div style="flex: 1; margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <h1 style="font-size: 2.6rem; font-weight: 800;">{{ artist.name }}</h1>
+            {% if artist.is_verified_artist %}
+            <span class="badge badge-verified" style="font-size: 0.8rem;">VERIFIED CREATOR ✓</span>
+            {% endif %}
+          </div>
+          <p style="color: var(--text-muted); font-size: 1rem;">{{ artist.genres|default:"Music Producer" }} • {{ artist.monthly_listeners }} monthly listeners</p>
+        </div>
+
+        <div style="display: flex; gap: 14px; margin-bottom: 8px;">
+          {% if user.is_authenticated and user == artist.user %}
+          <a href="{% url 'artists:dashboard' %}" class="btn btn-primary">Creator Studio</a>
+          {% else %}
+            {% if user.is_authenticated %}
+            <form method="POST" action="{% url 'artists:toggle_follow' artist.slug %}">
+              {% csrf_token %}
+              <button type="submit" class="btn {% if is_following %}btn-primary{% else %}btn-secondary{% endif %}">
+                {% if is_following %}Following{% else %}Follow{% endif %}
+              </button>
+            </form>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Showcase Grid -->
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px;">
+    <!-- Left Column: Popular Songs & Discography -->
+    <div>
+      <div class="glass-panel" style="margin-bottom: 32px;">
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 18px;">Popular Master Tracks</h3>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          {% for song in top_tracks %}
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); transition: background 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span style="font-weight: 700; color: var(--text-dim); width: 18px;">{{ forloop.counter }}</span>
+              <img src="{{ song.cover_art_url }}" style="width: 44px; height: 44px; border-radius: 4px; object-fit: cover;">
+              <div>
+                <a href="{% url 'music:song_detail' song.id %}" style="font-weight: 600; font-size: 0.95rem; color: var(--text-main); text-decoration: none;">{{ song.title }}</a>
+                <div style="font-size: 0.78rem; color: var(--text-dim);">{{ song.play_count }} streams</div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span style="font-size: 0.85rem; color: var(--text-dim);">{{ song.formatted_duration }}</span>
+              <button class="btn btn-secondary btn-sm" onclick="playSong('{{ song.id }}', '{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', '{{ song.cover_art_url|escapejs }}', '{% url 'music:stream' song.id %}')">▶</button>
+            </div>
+          </div>
+          {% empty %}
+          <p style="color: var(--text-dim); padding: 20px; text-align: center;">No tracks uploaded yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Albums -->
+      <div class="glass-panel">
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 18px;">Albums & EPs</h3>
+        <div class="media-grid">
+          {% for alb in albums %}
+          <a href="{% url 'albums:detail' alb.slug %}" class="music-card" style="text-decoration: none;">
+            <img src="{{ alb.cover_art_url }}" class="music-card-cover">
+            <div class="music-card-title">{{ alb.title }}</div>
+            <div class="music-card-artist">{{ alb.get_album_type_display }} • {{ alb.release_date|date:"Y"|default:"2026" }}</div>
+          </a>
+          {% empty %}
+          <p style="grid-column: 1 / -1; color: var(--text-dim); padding: 20px; text-align: center;">No albums released yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Bio, Members & Social Links -->
+    <div>
+      <div class="glass-panel" style="margin-bottom: 24px;">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 14px; color: var(--accent-cyan);">About the Artist</h3>
+        <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 20px;">
+          {{ artist.bio|default:"No bio provided yet." }}
+        </p>
+
+        {% if artist.country_of_origin %}
+        <div style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">
+          📍 Origin: <strong>{{ artist.country_of_origin }}</strong>
+        </div>
+        {% endif %}
+
+        {% if artist.website %}
+        <div style="font-size: 0.88rem; margin-bottom: 8px;">
+          🌐 <a href="{{ artist.website }}" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">Official Website</a>
+        </div>
+        {% endif %}
+      </div>
+
+      {% if members %}
+      <div class="glass-panel">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 14px;">Band Members</h3>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          {% for m in members %}
+          <div style="padding: 8px 12px; background: rgba(255,255,255,0.02); border-radius: 4px; font-size: 0.88rem;">
+            <strong>{{ m.name }}</strong> — <span style="color: var(--text-muted);">{{ m.role_instrument }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

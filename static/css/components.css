@@ -1,0 +1,302 @@
+/* ==========================================================================
+   MusicVerse Component Library - Glassmorphic Interactive Elements
+   ========================================================================== */
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 22px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border-radius: var(--border-radius-xl);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  outline: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-cyan), #00b4d8);
+  color: #060810;
+  box-shadow: 0 4px 18px rgba(0, 245, 212, 0.35);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 245, 212, 0.55);
+}
+
+.btn-secondary {
+  background: var(--bg-glass-card);
+  color: var(--text-main);
+  border-color: var(--border-glass);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn-gradient-purple {
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+  color: #ffffff;
+  box-shadow: 0 4px 18px rgba(123, 44, 191, 0.35);
+}
+
+.btn-gradient-purple:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(247, 37, 133, 0.5);
+}
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 0.82rem;
+}
+
+.btn-lg {
+  padding: 14px 32px;
+  font-size: 1.05rem;
+}
+
+/* Glassmorphic Form Controls */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-input-glass,
+.form-select-glass {
+  width: 100%;
+  padding: 12px 18px;
+  background: var(--bg-glass-input);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--border-radius-md);
+  color: var(--text-main);
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+
+.form-input-glass:focus,
+.form-select-glass:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: var(--glow-cyan);
+  background: rgba(18, 20, 32, 0.9);
+}
+
+.form-checkbox-glass {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-cyan);
+  cursor: pointer;
+}
+
+.form-radio-glass input[type="radio"] {
+  accent-color: var(--accent-cyan);
+  margin-right: 8px;
+}
+
+.form-file-glass {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg-glass-input);
+  border: 1px dashed var(--border-glass);
+  border-radius: var(--border-radius-md);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.form-file-glass:hover {
+  border-color: var(--accent-cyan);
+}
+
+.form-help-text {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin-top: 6px;
+}
+
+.form-error-msg {
+  font-size: 0.8rem;
+  color: #ef4444;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Badges & Tags */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: var(--border-radius-xl);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-premium {
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  color: #1a1000;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+.badge-verified {
+  background: rgba(0, 245, 212, 0.15);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0, 245, 212, 0.4);
+}
+
+.badge-lossless {
+  background: rgba(123, 44, 191, 0.2);
+  color: #d8b4fe;
+  border: 1px solid rgba(123, 44, 191, 0.5);
+}
+
+/* Auth Split View Container */
+.auth-split-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.auth-sidebar-art {
+  flex: 1.2;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 60px;
+  background: linear-gradient(180deg, rgba(10,11,16,0.3) 0%, rgba(10,11,16,0.95) 100%);
+}
+
+.auth-form-side {
+  flex: 1;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 50px 60px;
+  background: rgba(18, 20, 32, 0.85);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border-left: 1px solid var(--border-glass);
+}
+
+/* Grid Cards */
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 22px;
+}
+
+.music-card {
+  background: var(--bg-glass-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--border-radius-md);
+  padding: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  cursor: pointer;
+}
+
+.music-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), var(--glow-cyan);
+}
+
+.music-card-cover {
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: var(--border-radius-sm);
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
+.music-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music-card-artist {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+/* Toast System */
+#toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.toast-message {
+  pointer-events: auto;
+  min-width: 320px;
+  max-width: 440px;
+  padding: 16px 20px;
+  background: rgba(18, 20, 32, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--text-main);
+  font-size: 0.9rem;
+  animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast-success { border-left: 4px solid var(--status-success); }
+.toast-error { border-left: 4px solid var(--status-danger); }
+.toast-info { border-left: 4px solid var(--status-info); }
+.toast-warning { border-left: 4px solid var(--status-warning); }
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}

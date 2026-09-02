@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+  <div class="glass-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass);">
+      <div>
+        <h2 style="font-size: 1.5rem; font-weight: 700;">Edit Profile</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Update your biographical details and public identity.</p>
+      </div>
+      <a href="{% url 'accounts:profile' user.username %}" class="btn btn-secondary btn-sm">View Public Profile</a>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          {{ form.first_name }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          {{ form.last_name }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Profile Headline</label>
+        {{ form.headline }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Biographical Story</label>
+        {{ form.bio }}
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+          <label class="form-label">Location (City, State)</label>
+          {{ form.location }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Country</label>
+          {{ form.country }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Personal Website</label>
+        {{ form.website }}
+      </div>
+
+      <div style="margin: 28px 0 16px 0; border-top: 1px solid var(--border-glass); padding-top: 20px;">
+        <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--accent-cyan); margin-bottom: 16px;">Social Links</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Twitter / X</label>
+            {{ form.twitter_url }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Instagram</label>
+            {{ form.instagram_url }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Spotify Artist URL</label>
+            {{ form.spotify_url }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">SoundCloud</label>
+            {{ form.soundcloud_url }}
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 16px; margin-top: 28px;">
+        <button type="submit" class="btn btn-primary" style="padding: 12px 30px;">Save Profile Changes</button>
+        <a href="{% url 'accounts:profile' user.username %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

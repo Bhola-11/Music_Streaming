@@ -1,0 +1,13 @@
+{% if messages %}
+<div id="toast-container">
+  {% for message in messages %}
+  <div class="toast-message toast-{{ message.tags|default:'info' }}">
+    <span style="font-size: 1.2rem; font-weight: bold;">
+      {% if message.tags == 'success' %}✓{% elif message.tags == 'error' %}⚠️{% elif message.tags == 'warning' %}⚡{% else %}ℹ️{% endif %}
+    </span>
+    <div style="flex: 1;">{{ message }}</div>
+    <button style="background: none; border: none; color: #94A3B8; cursor: pointer; font-size: 1.1rem;" onclick="this.parentElement.remove()">✕</button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}

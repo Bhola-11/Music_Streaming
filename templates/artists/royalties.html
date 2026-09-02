@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Royalties & Payouts — Creator Studio{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto;">
+  <div style="margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h1 style="font-size: 1.8rem; font-weight: 800;">💰 Royalties & Payouts</h1>
+      <p style="color: var(--text-muted); font-size: 0.92rem;">Monthly earnings from streaming, payout accounts, and financial history.</p>
+    </div>
+    <a href="{% url 'artists:dashboard' %}" class="btn btn-secondary">← Studio Dashboard</a>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 28px;">
+    <!-- Royalty Statements History -->
+    <div class="glass-panel">
+      <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 18px;">Royalty Statement History</h3>
+      
+      {% if statements %}
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for stmt in statements %}
+        <div style="padding: 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); border: 1px solid var(--border-glass);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div>
+              <span style="font-weight: 700; font-size: 1rem;">{{ stmt.period_start|date:"F Y" }}</span>
+              <span style="font-size: 0.78rem; color: var(--text-dim); margin-left: 8px;">{{ stmt.period_start|date:"M j" }} – {{ stmt.period_end|date:"M j, Y" }}</span>
+            </div>
+            {% if stmt.is_paid %}
+            <span class="badge badge-verified">PAID</span>
+            {% else %}
+            <span class="badge badge-lossless">PENDING</span>
+            {% endif %}
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 0.85rem;">
+            <div>
+              <div style="color: var(--text-dim); font-size: 0.75rem;">STREAMS</div>
+              <div style="font-weight: 700; color: var(--text-main);">{{ stmt.total_streams }}</div>
+            </div>
+            <div>
+              <div style="color: var(--text-dim); font-size: 0.75rem;">GROSS EARNINGS</div>
+              <div style="font-weight: 700; color: var(--text-main);">\${{ stmt.gross_earnings_usd }}</div>
+            </div>
+            <div>
+              <div style="color: var(--text-dim); font-size: 0.75rem;">NET PAYABLE</div>
+              <div style="font-weight: 700; color: var(--accent-green);">\${{ stmt.net_payable_usd }}</div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div style="text-align: center; padding: 40px; color: var(--text-dim);">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">📊</div>
+        <p style="font-size: 0.9rem;">Your first royalty statement will be generated at end of the month.</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Payout Account -->
+    <div>
+      <div class="glass-panel" style="margin-bottom: 24px;">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 16px;">Payout Account</h3>
+        
+        {% if payout_account %}
+        <div style="padding: 14px; background: rgba(0, 255, 136, 0.05); border: 1px solid rgba(0, 255, 136, 0.15); border-radius: var(--border-radius-sm); margin-bottom: 18px; font-size: 0.9rem;">
+          <div style="font-weight: 700; margin-bottom: 4px;">{{ payout_account.get_account_type_display }}</div>
+          <div style="color: var(--text-muted);">{{ payout_account.beneficiary_name }}</div>
+          <div style="color: var(--text-dim); font-size: 0.8rem;">{{ payout_account.currency }} • Configured ✓</div>
+        </div>
+        {% endif %}
+
+        <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-bottom: 14px;">
+          {% if payout_account %}Update Payout Account{% else %}Configure Payout Account{% endif %}
+        </h4>
+
+        <form method="POST">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-label">Account Type</label>
+            {{ payout_form.account_type }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Beneficiary Legal Name</label>
+            {{ payout_form.beneficiary_name }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Account Identifier</label>
+            {{ payout_form.account_identifier }}
+            <p class="form-help-text">Stripe Connect ID, PayPal email, or bank IBAN</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payout Currency</label>
+            {{ payout_form.currency }}
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">Save Payout Settings</button>
+        </form>
+      </div>
+
+      {% if artist %}
+      <div class="glass-panel">
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 12px;">Unpaid Balance</h3>
+        <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent-green); margin-bottom: 6px;">\${{ artist.unpaid_balance }}</div>
+        <p style="font-size: 0.8rem; color: var(--text-dim);">Processed monthly to configured payout account.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

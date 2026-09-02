@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Spotlight Artists & Creators — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 1240px; margin: 0 auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+      <h1 style="font-size: 1.8rem; font-weight: 800;">Featured Artists & Creators</h1>
+      <p style="color: var(--text-muted); font-size: 0.92rem;">Discover verified producers, composers, and indie musicians on MusicVerse.</p>
+    </div>
+
+    {% if user.is_authenticated and not user.is_artist_user %}
+    <a href="{% url 'artists:edit_profile' %}" class="btn btn-primary">🎤 Become a Verified Creator</a>
+    {% endif %}
+  </div>
+
+  <div class="media-grid">
+    {% for artist in artists %}
+    <div class="music-card" style="text-align: center;" onclick="window.location.href='{% url 'artists:detail' artist.slug %}'">
+      <img src="{{ artist.avatar_display }}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: 0 auto 12px auto; display: block; box-shadow: 0 4px 16px rgba(0,0,0,0.5);">
+      <div class="music-card-title">
+        {{ artist.name }}
+        {% if artist.is_verified_artist %}
+        <span style="color: var(--accent-cyan); font-size: 0.85rem;" title="Verified Artist">✓</span>
+        {% endif %}
+      </div>
+      <div class="music-card-artist">{{ artist.genres|default:"Electronic / Cyber" }}</div>
+      <div style="margin-top: 8px; font-size: 0.78rem; color: var(--text-dim);">
+        {{ artist.monthly_listeners }} monthly listeners
+      </div>
+    </div>
+    {% empty %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: var(--text-dim);">
+      🎤 No artists listed yet.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

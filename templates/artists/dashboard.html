@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Creator Studio Dashboard — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+  <div style="margin-bottom: 28px;">
+    <h1 style="font-size: 1.8rem; font-weight: 800;">🎛️ Creator Studio</h1>
+    <p style="color: var(--text-muted); font-size: 0.92rem;">Manage your catalog, track royalties, and grow your audience.</p>
+  </div>
+
+  {% if not has_artist_profile %}
+  <div class="glass-panel" style="text-align: center; padding: 60px;">
+    <div style="font-size: 4rem; margin-bottom: 16px;">🎤</div>
+    <h2 style="font-size: 1.6rem; margin-bottom: 12px;">Create Your Artist Profile</h2>
+    <p style="color: var(--text-muted); max-width: 400px; margin: 0 auto 24px;">You haven't set up your artist profile yet. Join MusicVerse as a creator to upload tracks, release albums, and earn royalties.</p>
+    <a href="{% url 'artists:edit_profile' %}" class="btn btn-primary" style="padding: 14px 36px; font-size: 1.05rem;">Get Started as an Artist</a>
+  </div>
+  {% else %}
+
+  <!-- Studio Stats Summary -->
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px;">
+    <div class="glass-panel" style="text-align: center; padding: 24px;">
+      <div style="font-size: 2rem; font-weight: 800; color: var(--accent-cyan);">{{ total_plays }}</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">Total Streams</div>
+    </div>
+    <div class="glass-panel" style="text-align: center; padding: 24px;">
+      <div style="font-size: 2rem; font-weight: 800; color: var(--accent-purple);">{{ songs|length }}</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">Total Tracks</div>
+    </div>
+    <div class="glass-panel" style="text-align: center; padding: 24px;">
+      <div style="font-size: 2rem; font-weight: 800; color: var(--accent-green);">{{ albums|length }}</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">Albums</div>
+    </div>
+    <div class="glass-panel" style="text-align: center; padding: 24px;">
+      <div style="font-size: 2rem; font-weight: 800; color: var(--accent-amber)">\${{ artist.unpaid_balance }}</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">Pending Royalties</div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="glass-panel" style="margin-bottom: 28px; padding: 20px;">
+    <h3 style="font-weight: 700; margin-bottom: 14px; font-size: 1rem; color: var(--text-muted);">QUICK ACTIONS</h3>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <a href="{% url 'music:upload' %}" class="btn btn-primary">⚡ Upload Track</a>
+      <a href="{% url 'albums:create' %}" class="btn btn-secondary">💿 Create Album</a>
+      <a href="{% url 'artists:edit_profile' %}" class="btn btn-secondary">✏️ Edit Profile</a>
+      <a href="{% url 'artists:royalties' %}" class="btn btn-secondary">💰 Royalties & Payouts</a>
+      {% if artist.verification_status == 'unverified' %}
+      <a href="{% url 'artists:verification_request' %}" class="btn btn-secondary">🏅 Apply for Verification</a>
+      {% elif artist.verification_status == 'pending' %}
+      <span class="btn btn-secondary" style="opacity: 0.7; cursor: default;">⏳ Verification Pending...</span>
+      {% elif artist.verification_status == 'verified' %}
+      <span class="badge badge-verified" style="padding: 8px 16px;">✓ Verified Artist</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Recent Tracks -->
+  <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px;">
+    <div class="glass-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.15rem; font-weight: 700;">Recent Tracks</h3>
+        <a href="{% url 'music:song_list' %}?artist={{ artist.slug }}" style="font-size: 0.82rem; color: var(--accent-cyan); text-decoration: none;">View All →</a>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for song in songs %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm);">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="{{ song.cover_art_url }}" style="width: 38px; height: 38px; border-radius: 4px; object-fit: cover;">
+            <div>
+              <a href="{% url 'music:song_detail' song.id %}" style="font-weight: 600; font-size: 0.9rem; color: var(--text-main); text-decoration: none;">{{ song.title }}</a>
+              <div style="font-size: 0.75rem; color: var(--text-dim);">{{ song.play_count }} streams</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <a href="{% url 'music:song_edit' song.id %}" class="btn btn-secondary btn-sm">Edit</a>
+          </div>
+        </div>
+        {% empty %}
+        <p style="color: var(--text-dim); text-align: center; padding: 24px; font-size: 0.9rem;">No tracks yet. Upload your first master.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Royalty Statements -->
+    <div class="glass-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.15rem; font-weight: 700;">Royalty Statements</h3>
+        <a href="{% url 'artists:royalties' %}" style="font-size: 0.82rem; color: var(--accent-cyan); text-decoration: none;">Full History →</a>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        {% for stmt in statements %}
+        <div style="padding: 12px 14px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm);">
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+            <span style="color: var(--text-main); font-weight: 600;">{{ stmt.period_start|date:"M Y" }}</span>
+            <span style="color: var(--accent-green); font-weight: 700;">\${{ stmt.net_payable_usd }}</span>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px;">{{ stmt.total_streams }} streams • {% if stmt.is_paid %}<span style="color: var(--accent-green);">Paid</span>{% else %}<span style="color: var(--accent-amber);">Pending</span>{% endif %}</div>
+        </div>
+        {% empty %}
+        <p style="color: var(--text-dim); font-size: 0.9rem; text-align: center; padding: 24px;">First statement generated monthly.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {% endif %}
+</div>
+{% endblock %}

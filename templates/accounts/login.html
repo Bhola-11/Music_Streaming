@@ -1,0 +1,47 @@
+{% extends 'auth_base.html' %}
+
+{% block title %}Sign In — MusicVerse{% endblock %}
+
+{% block auth_content %}
+<div style="margin-bottom: 32px;">
+  <h2 style="font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Welcome Back</h2>
+  <p style="color: var(--text-muted); font-size: 0.95rem;">Enter your credentials to access your audio universe.</p>
+</div>
+
+<form method="POST" action="{% url 'accounts:login' %}">
+  {% csrf_token %}
+
+  <div class="form-group">
+    <label class="form-label" for="id_email">Email Address</label>
+    {{ form.email }}
+    {% if form.email.errors %}
+      <div class="form-error-msg">{{ form.email.errors.0 }}</div>
+    {% endif %}
+  </div>
+
+  <div class="form-group">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <label class="form-label" for="id_password" style="margin-bottom: 0;">Password</label>
+      <a href="#" style="font-size: 0.8rem; color: var(--accent-cyan); text-decoration: none;">Forgot password?</a>
+    </div>
+    {{ form.password }}
+    {% if form.password.errors %}
+      <div class="form-error-msg">{{ form.password.errors.0 }}</div>
+    {% endif %}
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 24px;">
+    {{ form.remember_me }}
+    <label for="id_remember_me" style="font-size: 0.88rem; color: var(--text-muted); cursor: pointer;">{{ form.remember_me.label }}</label>
+  </div>
+
+  <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem;">
+    Sign In to MusicVerse
+  </button>
+</form>
+
+<div style="margin-top: 32px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+  Don't have an account yet? 
+  <a href="{% url 'accounts:register' %}" style="color: var(--accent-cyan); font-weight: 600; text-decoration: none;">Create Account</a>
+</div>
+{% endblock %}

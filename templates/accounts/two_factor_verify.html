@@ -1,0 +1,31 @@
+{% extends 'auth_base.html' %}
+
+{% block title %}Two-Factor Challenge — MusicVerse{% endblock %}
+
+{% block auth_content %}
+<div style="text-align: center; margin-bottom: 28px;">
+  <div style="font-size: 3rem; margin-bottom: 12px;">🛡️</div>
+  <h2 style="font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Two-Factor Challenge</h2>
+  <p style="color: var(--text-muted); font-size: 0.95rem;">Enter the security code from your authenticator app.</p>
+</div>
+
+<form method="POST" action="{% url 'accounts:two_factor_verify' %}">
+  {% csrf_token %}
+
+  <div class="form-group" style="text-align: center;">
+    {{ form.code }}
+    {% if form.code.errors %}
+      <div class="form-error-msg" style="justify-content: center;">{{ form.code.errors.0 }}</div>
+    {% endif %}
+    <p class="form-help-text" style="margin-top: 10px;">{{ form.code.help_text }}</p>
+  </div>
+
+  <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem; margin-top: 16px;">
+    Verify & Unlock Account
+  </button>
+</form>
+
+<div style="margin-top: 24px; text-align: center;">
+  <a href="{% url 'accounts:login' %}" style="color: var(--text-muted); font-size: 0.88rem; text-decoration: none;">← Back to Sign In</a>
+</div>
+{% endblock %}

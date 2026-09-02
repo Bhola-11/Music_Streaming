@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Audit Trail Records — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+  <div class="glass-panel" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2 style="font-size: 1.4rem; font-weight: 700;">Audit Logs & System Operations</h2>
+      <a href="{% url 'audit:dashboard' %}" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+    </div>
+
+    <!-- Filter Bar -->
+    <form method="GET" style="display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px;">
+      <input type="text" name="q" value="{{ search_query }}" placeholder="Filter by action or user..." class="form-input-glass" style="max-width: 280px;">
+      
+      <select name="category" class="form-select-glass" style="max-width: 220px;">
+        <option value="">All Categories</option>
+        {% for cat_val, cat_name in categories %}
+        <option value="{{ cat_val }}" {% if current_category == cat_val %}selected{% endif %}>{{ cat_name }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="severity" class="form-select-glass" style="max-width: 180px;">
+        <option value="">All Severities</option>
+        {% for sev_val, sev_name in severities %}
+        <option value="{{ sev_val }}" {% if current_severity == sev_val %}selected{% endif %}>{{ sev_name }}</option>
+        {% endfor %}
+      </select>
+
+      <button type="submit" class="btn btn-primary btn-sm">Apply Filters</button>
+    </form>
+
+    <!-- Table -->
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left;">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--border-glass); color: var(--text-dim); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;">
+            <th style="padding: 12px 14px;">Timestamp</th>
+            <th style="padding: 12px 14px;">Action Type</th>
+            <th style="padding: 12px 14px;">Actor</th>
+            <th style="padding: 12px 14px;">Category</th>
+            <th style="padding: 12px 14px;">Severity</th>
+            <th style="padding: 12px 14px;">IP Address</th>
+            <th style="padding: 12px 14px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+            <td style="padding: 12px 14px; font-family: monospace; color: var(--text-muted);">{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+            <td style="padding: 12px 14px; font-weight: 600; color: var(--text-main);">{{ log.action_type }}</td>
+            <td style="padding: 12px 14px; color: var(--text-muted);">{{ log.actor_email|default:"System" }}</td>
+            <td style="padding: 12px 14px;"><span class="badge badge-verified" style="font-size: 0.65rem;">{{ log.category }}</span></td>
+            <td style="padding: 12px 14px;">
+              <span class="badge {% if log.severity == 'CRITICAL' %}badge-premium{% elif log.severity == 'HIGH' %}badge-lossless{% else %}badge-verified{% endif %}" style="font-size: 0.65rem;">
+                {{ log.severity }}
+              </span>
+            </td>
+            <td style="padding: 12px 14px; font-family: monospace; color: var(--text-dim);">{{ log.ip_address }}</td>
+            <td style="padding: 12px 14px;">
+              <a href="{% url 'audit:log_detail' log.id %}" style="color: var(--accent-cyan); text-decoration: none;">View Details</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 30px; color: var(--text-dim);">No audit logs matched your query.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

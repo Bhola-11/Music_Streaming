@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Personalize Your MusicVerse Experience{% endblock %}
+
+{% block content %}
+<div style="max-width: 880px; margin: 40px auto;">
+  <div class="glass-panel" style="padding: 36px;">
+    <!-- Step Indicator -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid var(--border-glass); padding-bottom: 20px;">
+      <div>
+        <span class="badge badge-verified">Step {{ current_step }} of 3</span>
+        <h2 style="font-size: 1.6rem; font-weight: 800; margin-top: 8px;">
+          {% if current_step == 1 %}
+            Select Your Sonic Frequencies
+          {% elif current_step == 2 %}
+            Follow Artists You Love
+          {% else %}
+            Configure Audio Fidelity & Visuals
+          {% endif %}
+        </h2>
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <div style="width: 28px; height: 6px; border-radius: 3px; background: {% if current_step >= 1 %}var(--accent-cyan){% else %}rgba(255,255,255,0.1){% endif %};"></div>
+        <div style="width: 28px; height: 6px; border-radius: 3px; background: {% if current_step >= 2 %}var(--accent-cyan){% else %}rgba(255,255,255,0.1){% endif %};"></div>
+        <div style="width: 28px; height: 6px; border-radius: 3px; background: {% if current_step >= 3 %}var(--accent-cyan){% else %}rgba(255,255,255,0.1){% endif %};"></div>
+      </div>
+    </div>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      {% if current_step == 1 %}
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px;">Pick 3 or more genres to calibrate your custom recommendation feed:</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px;">
+          {% for genre in genres %}
+          <label style="display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: var(--border-radius-md); cursor: pointer; transition: all 0.2s ease;">
+            <input type="checkbox" name="genres" value="{{ genre.id }}" class="form-checkbox-glass">
+            <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">{{ genre.name }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">Continue to Artists →</button>
+
+      {% elif current_step == 2 %}
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px;">Follow creators to receive release notifications and updates in your feed:</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px;">
+          {% for artist in artists %}
+          <label style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: var(--border-radius-md); cursor: pointer;">
+            <img src="{{ artist.avatar_display }}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;">
+            <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">{{ artist.name }}</span>
+            <span style="font-size: 0.75rem; color: var(--text-dim); margin-top: 2px;">{{ artist.monthly_listeners }} listeners</span>
+            <input type="checkbox" name="artists" value="{{ artist.id }}" class="form-checkbox-glass" style="margin-top: 10px;">
+          </label>
+          {% endfor %}
+        </div>
+        <div style="display: flex; gap: 16px;">
+          <a href="?step=1" class="btn btn-secondary">← Back</a>
+          <button type="submit" class="btn btn-primary btn-lg" style="flex: 1;">Continue to Settings →</button>
+        </div>
+
+      {% elif current_step == 3 %}
+        <div style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 32px;">
+          <div class="form-group">
+            <label class="form-label">Streaming Audio Quality</label>
+            <select name="audio_quality" class="form-select-glass">
+              <option value="standard" selected>Standard High Quality (320 kbps MP3)</option>
+              <option value="lossless">Hi-Fi Studio Master (1411 kbps FLAC)</option>
+              <option value="low">Data Saver (96 kbps AAC)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Default 3D Visualizer Mode</label>
+            <select name="visualizer_mode" class="form-select-glass">
+              <option value="3d-particle-mesh" selected>3D Cosmic Particle Mesh (Three.js)</option>
+              <option value="neon-bars">Neon Cyber Frequency Bars</option>
+              <option value="tunnel-vortex">3D Warp Tunnel Visualizer</option>
+              <option value="off">Disabled</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Interface Theme</label>
+            <select name="theme" class="form-select-glass">
+              <option value="dark-cosmic" selected>Cosmic Void (Deep Space & Violet)</option>
+              <option value="neon-cyber">Neon Cyber (Cyan & Magenta)</option>
+              <option value="obsidian">Obsidian Minimal (Pure Monochrome)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 16px;">
+          <a href="?step=2" class="btn btn-secondary">← Back</a>
+          <button type="submit" class="btn btn-primary btn-lg" style="flex: 1;">Complete Setup & Start Streaming 🚀</button>
+        </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}

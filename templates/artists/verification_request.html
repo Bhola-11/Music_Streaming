@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Artist Verification Application — MusicVerse{% endblock %}
+
+{% block content %}
+<div style="max-width: 780px; margin: 0 auto;">
+  <div class="glass-panel">
+    <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass);">
+      <h2 style="font-size: 1.6rem; font-weight: 800;">🏅 Apply for Verified Artist Status</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        MusicVerse verifies artists who are publicly known musicians, producers, or official representatives of music entities.
+        The review process typically takes 3-5 business days.
+      </p>
+    </div>
+
+    <div class="glass-panel" style="background: rgba(0, 195, 255, 0.05); border: 1px solid rgba(0, 195, 255, 0.15); margin-bottom: 28px;">
+      <h4 style="color: var(--accent-cyan); font-size: 0.95rem; font-weight: 700; margin-bottom: 10px;">Verification Requirements</h4>
+      <ul style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.8; padding-left: 20px;">
+        <li>A government-issued ID or official artist entity documentation</li>
+        <li>Official streaming profile links (Spotify for Artists / Apple Music)</li>
+        <li>Active social media presence or label affiliation</li>
+      </ul>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label class="form-label">Legal Full Name or Entity Name</label>
+        {{ form.legal_name }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Official Identity Document (PDF, JPG, PNG — Max 10MB)</label>
+        {{ form.official_id_document }}
+        <p class="form-help-text">Accepted: Passport, National ID, Official Artist Statement, Label Agreement</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Social Proof Links (Spotify, Apple Music, Official Website...)</label>
+        {{ form.social_proof_links }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Additional Notes for the Moderation Team</label>
+        {{ form.notes }}
+      </div>
+
+      <div style="display: flex; gap: 16px; margin-top: 28px;">
+        <button type="submit" class="btn btn-primary" style="padding: 12px 32px;">Submit Application</button>
+        <a href="{% url 'artists:dashboard' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

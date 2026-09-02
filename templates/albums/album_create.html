@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Album — Creator Studio{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+  <div class="glass-panel">
+    <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass);">
+      <h2 style="font-size: 1.5rem; font-weight: 700;">Create Album Release</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Assemble an LP, EP, or compilation and prepare your release package.</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label class="form-label">Album Title</label>
+        {{ form.title }}
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+          <label class="form-label">Release Type</label>
+          {{ form.album_type }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Record Label (Optional)</label>
+          {{ form.record_label }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Album Cover Art (Square 3000x3000px Recommended)</label>
+        {{ form.cover_art }}
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+          <label class="form-label">Official Release Date</label>
+          {{ form.release_date }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">UPC Barcode (Optional)</label>
+          {{ form.upc_code }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Liner Notes & Album Story</label>
+        {{ form.description }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Copyright Notice</label>
+        {{ form.copyright_line }}
+      </div>
+
+      <div style="display: flex; gap: 24px; margin: 20px 0;">
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+          {{ form.is_published }} Publish Immediately
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+          {{ form.is_explicit }} Explicit Content
+        </label>
+      </div>
+
+      <div style="display: flex; gap: 16px; margin-top: 28px;">
+        <button type="submit" class="btn btn-primary" style="padding: 12px 32px;">Create Album</button>
+        <a href="{% url 'artists:dashboard' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
