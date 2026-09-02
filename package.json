@@ -1,0 +1,14 @@
+{
+  "name": "musicverse-streaming",
+  "version": "1.0.0",
+  "description": "MusicVerse High-Performance Music Streaming & Creator Platform",
+  "private": true,
+  "scripts": {
+    "build:css": "echo 'Building styles...'",
+    "test:ui": "echo 'Running UI tests...'"
+  },
+  "dependencies": {
+    "three": "^0.160.0",
+    "howler": "^2.2.4"
+  }
+}
