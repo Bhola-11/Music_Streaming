@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Content Moderation Queue — Staff Command{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+      <h1 style="font-size: 1.8rem; font-weight: 800;">⚖️ Content Moderation & Takedowns</h1>
+      <p style="color: var(--text-muted); font-size: 0.92rem;">Review user reports, DMCA copyright claims, explicit content flags, and audio leak investigations.</p>
+    </div>
+
+    <!-- Status Filters -->
+    <div style="display: flex; gap: 8px;">
+      <a href="?status=pending" class="btn {% if request.GET.status == 'pending' or not request.GET.status %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">Pending</a>
+      <a href="?status=investigating" class="btn {% if request.GET.status == 'investigating' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">Investigating</a>
+      <a href="?status=all" class="btn {% if request.GET.status == 'all' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">All Reports</a>
+    </div>
+  </div>
+
+  <div class="glass-panel">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      {% for rep in reports %}
+      <div style="padding: 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); border: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <span style="font-size: 1.6rem;">
+            {% if rep.reason == 'copyright_dmca' %}🛡️
+            {% elif rep.reason == 'hate_speech' %}⚠️
+            {% elif rep.reason == 'audio_leak' %}⚡
+            {% else %}🚩{% endif %}
+          </span>
+          <div>
+            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 4px;">
+              <span class="badge badge-lossless">{{ rep.get_reason_display }}</span>
+              <span class="badge badge-verified">{{ rep.get_status_display }}</span>
+              <span style="font-size: 0.8rem; color: var(--text-dim);">Report #{{ rep.id|stringformat:'s'|slice:':8' }}</span>
+            </div>
+            <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-main);">
+              Target: {% if rep.song %}Song: "{{ rep.song.title }}" by {{ rep.song.artist.name }}{% elif rep.artist %}Artist: {{ rep.artist.name }}{% else %}General Flag{% endif %}
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">{{ rep.description|truncatewords:20 }}</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <a href="{% url 'moderation:report_detail' rep.id %}" class="btn btn-primary btn-sm">Investigate →</a>
+        </div>
+      </div>
+      {% empty %}
+      <div style="text-align: center; padding: 60px; color: var(--text-dim);">
+        <div style="font-size: 3rem; margin-bottom: 12px;">✅</div>
+        <p style="font-size: 1.05rem;">All clean! No pending moderation reports in this queue.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

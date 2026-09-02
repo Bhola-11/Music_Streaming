@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Artist Audience Analytics — Creator Studio{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
+    <div>
+      <h1 style="font-size: 1.8rem; font-weight: 800;">📈 Audience & Stream Analytics</h1>
+      <p style="color: var(--text-muted); font-size: 0.92rem;">Granular stream retention metrics, completion percentage, and top performing tracks.</p>
+    </div>
+    <a href="{% url 'artists:dashboard' %}" class="btn btn-secondary btn-sm">← Studio Dashboard</a>
+  </div>
+
+  {% if artist %}
+  <!-- Stats summary -->
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px;">
+    <div class="glass-panel" style="text-align: center; padding: 20px;">
+      <div style="font-size: 2rem; font-weight: 800; color: var(--accent-cyan);">{{ total_streams }}</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Total Plays</div>
+    </div>
+    <div class="glass-panel" style="text-align: center; padding: 20px;">
+      <div style="font-size: 2rem; font-weight: 800; color: var(--accent-purple);">{{ artist.monthly_listeners }}</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Monthly Listeners</div>
+    </div>
+    <div class="glass-panel" style="text-align: center; padding: 20px;">
+      <div style="font-size: 2rem; font-weight: 800; color: var(--accent-green);">{{ artist.follower_count }}</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Followers</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 28px;">
+    <!-- Top Tracks -->
+    <div class="glass-panel">
+      <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 16px;">Top Performing Tracks</h3>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        {% for t in tracks %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255,255,255,0.02); border-radius: 4px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-weight: 700; color: var(--text-dim); width: 16px;">{{ forloop.counter }}</span>
+            <img src="{{ t.cover_art_url }}" style="width: 36px; height: 36px; border-radius: 4px; object-fit: cover;">
+            <span style="font-weight: 600; font-size: 0.9rem;">{{ t.title }}</span>
+          </div>
+          <span style="font-weight: 700; color: var(--accent-cyan); font-size: 0.88rem;">{{ t.play_count }} plays</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Recent Streams Stream Log -->
+    <div class="glass-panel">
+      <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 16px;">Live Stream Audit Feed</h3>
+      <div style="display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto;">
+        {% for s in recent_streams %}
+        <div style="padding: 10px 12px; background: rgba(255,255,255,0.02); border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+          <div>
+            <span style="font-weight: 600; color: var(--text-main);">{{ s.song.title }}</span>
+            <div style="font-size: 0.75rem; color: var(--text-dim);">By {{ s.user.username }} • {{ s.seconds_played }}s listened</div>
+          </div>
+          <span style="color: {% if s.was_skipped %}#ff6b6b{% else %}var(--accent-green){% endif %}; font-weight: 600; font-size: 0.8rem;">
+            {% if s.was_skipped %}Skipped{% else %}{{ s.completion_percentage|floatformat:0 }}% Complete{% endif %}
+          </span>
+        </div>
+        {% empty %}
+        <p style="color: var(--text-dim); text-align: center; padding: 24px;">No stream telemetry recorded yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

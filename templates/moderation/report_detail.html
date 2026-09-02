@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Investigate Report #{{ report.id|stringformat:'s'|slice:':8' }} — Moderation{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+  <div class="glass-panel" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass);">
+      <div>
+        <span class="badge badge-lossless">{{ report.get_reason_display }}</span>
+        <h2 style="font-size: 1.6rem; font-weight: 800; margin-top: 6px;">Report Investigation</h2>
+      </div>
+      <a href="{% url 'moderation:queue' %}" class="btn btn-secondary btn-sm">← Back to Queue</a>
+    </div>
+
+    <!-- Target Entity Card -->
+    {% if report.song %}
+    <div style="padding: 16px; background: rgba(0,0,0,0.3); border-radius: var(--border-radius-sm); border: 1px solid var(--border-glass); margin-bottom: 24px; display: flex; gap: 20px; align-items: center;">
+      <img src="{{ report.song.cover_art_url }}" style="width: 80px; height: 80px; border-radius: 6px; object-fit: cover;">
+      <div>
+        <h3 style="font-size: 1.2rem; font-weight: 700;">{{ report.song.title }}</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">By {{ report.song.artist.name }} • Published: {{ report.song.is_published }}</p>
+        <div style="margin-top: 6px;">
+          <a href="{% url 'music:song_detail' report.song.id %}" target="_blank" class="btn btn-secondary btn-sm">View Song Page ↗</a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Report Details -->
+    <div style="margin-bottom: 28px;">
+      <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">CLAIMANT DESCRIPTION:</h4>
+      <p style="color: var(--text-main); font-size: 0.95rem; line-height: 1.6; padding: 14px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm);">
+        {{ report.description }}
+      </p>
+
+      {% if report.evidence_url %}
+      <div style="margin-top: 12px; font-size: 0.9rem;">
+        <strong>Evidence URL:</strong> <a href="{{ report.evidence_url }}" target="_blank" style="color: var(--accent-cyan);">{{ report.evidence_url }}</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Action Decision Form -->
+    <div style="border-top: 1px solid var(--border-glass); padding-top: 24px;">
+      <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-muted); margin-bottom: 14px;">MODERATION ACTION:</h4>
+      <form method="POST" action="{% url 'moderation:decision' report.id %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Resolution Notes / Reason</label>
+          <textarea name="notes" rows="3" class="form-input-glass" placeholder="Explain the legal or policy basis for the decision..." required></textarea>
+        </div>
+
+        <div style="display: flex; gap: 16px;">
+          <button type="submit" name="action" value="takedown" class="btn btn-primary" style="background: #ff4757; border-color: #ff4757;" onclick="return confirm('Execute content takedown and unpublish media?')">
+            🛑 Execute Content Takedown
+          </button>
+          <button type="submit" name="action" value="dismiss" class="btn btn-secondary" onclick="return confirm('Dismiss report with no violation?')">
+            Dismiss Report
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

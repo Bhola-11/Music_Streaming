@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Global Platform & Stream Farm Analytics — MusicVerse Intelligence{% endblock %}
+
+{% block content %}
+<div style="max-width: 1240px; margin: 0 auto;">
+  <div style="margin-bottom: 28px;">
+    <h1 style="font-size: 1.8rem; font-weight: 800;">📊 Global Platform Intelligence</h1>
+    <p style="color: var(--text-muted); font-size: 0.92rem;">Real-time playback throughput, storage bandwidth, geo distribution, and anti-fraud telemetry.</p>
+  </div>
+
+  <!-- Key Metrics Row -->
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 32px;">
+    <div class="glass-panel" style="text-align: center; padding: 24px;">
+      <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-cyan);">{{ total_streams_all_time }}</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">Total All-Time Streams</div>
+    </div>
+    <div class="glass-panel" style="text-align: center; padding: 24px;">
+      <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-purple);">{{ total_users }}</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">Registered Accounts</div>
+    </div>
+    <div class="glass-panel" style="text-align: center; padding: 24px;">
+      <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-green);">{{ total_songs }}</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">Master Audio Tracks</div>
+    </div>
+    <div class="glass-panel" style="text-align: center; padding: 24px;">
+      <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-pink);">{{ total_artists }}</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">Active Creators</div>
+    </div>
+  </div>
+
+  <!-- 7-Day Performance & Geo Distribution -->
+  <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 28px; margin-bottom: 32px;">
+    <!-- 7-Day Daily Platform Metric History -->
+    <div class="glass-panel">
+      <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 16px;">7-Day Stream Velocity</h3>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for m in recent_metrics %}
+        <div style="padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: var(--border-radius-sm); display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <span style="font-weight: 700;">{{ m.date|date:"l, M j" }}</span>
+            <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 2px;">{{ m.unique_listeners }} unique listeners • {{ m.bandwidth_served_gb }} GB bandwidth</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-weight: 800; color: var(--accent-cyan);">{{ m.total_streams }} plays</div>
+            <div style="font-size: 0.75rem; color: var(--accent-green);">${{ m.royalty_accrued_usd }} accrued</div>
+          </div>
+        </div>
+        {% empty %}
+        <p style="color: var(--text-dim); text-align: center; padding: 24px;">Today's metric rollup executes at midnight UTC.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Geo Distribution -->
+    <div class="glass-panel">
+      <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 16px;">Top Streaming Regions</h3>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        {% for g in geo_heatmap %}
+        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; padding: 8px 12px; background: rgba(255,255,255,0.02); border-radius: 4px;">
+          <span>🌐 {{ g.country_name }} ({{ g.country_code }})</span>
+          <span style="font-weight: 700; color: var(--text-main);">{{ g.stream_count }} plays</span>
+        </div>
+        {% empty %}
+        <p style="color: var(--text-dim); text-align: center; padding: 20px;">Global distribution accumulating.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Suspicious Activity & Stream Farm Flags -->
+  <div class="glass-panel">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; color: #ff4757;">🛡️ Anti-Stream-Farm & Anomaly Detection Logs</h3>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      {% for flag in suspicious_flags %}
+      <div style="padding: 12px 16px; background: rgba(255, 71, 87, 0.05); border: 1px solid rgba(255, 71, 87, 0.2); border-radius: var(--border-radius-sm); display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <span style="font-weight: 700; color: #ff6b6b;">{{ flag.flag_reason }}</span>
+          <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 2px;">IP: {{ flag.ip_address }} • Burst count: {{ flag.stream_burst_count }} plays</div>
+        </div>
+        <div>
+          <span class="badge badge-lossless" style="background: #ff4757;">BLOCKED</span>
+        </div>
+      </div>
+      {% empty %}
+      <p style="color: var(--text-dim); padding: 20px; text-align: center;">No automated stream farm anomalies detected in the past 24 hours.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
